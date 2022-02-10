@@ -36,35 +36,6 @@ class Style {
     Color(0xff66D3C5),
   ];
 
-  // static InputDecoration inputFieldDecorationWithoutLabel({String title = ''}) {
-  //   return InputDecoration(
-  //     filled: true,
-  //     fillColor: Style.primary.withOpacity(0.048),
-  //     hintText: title,
-  //     hintStyle: Style.textTheme.caption!.copyWith(
-  //       color: Colors.black38,
-  //     ),
-  //     contentPadding: const EdgeInsets.symmetric(
-  //       horizontal: 8,
-  //       vertical: 8,
-  //     ),
-  //     enabledBorder: OutlineInputBorder(
-  //       borderSide: const BorderSide(
-  //         color: Colors.black12,
-  //         width: 0.8,
-  //       ),
-  //       borderRadius: BorderRadius.circular(4),
-  //     ),
-  //     focusedBorder: OutlineInputBorder(
-  //       borderSide: BorderSide(
-  //         color: Style.primary.shade800,
-  //         width: 1.64,
-  //       ),
-  //       borderRadius: BorderRadius.circular(6),
-  //     ),
-  //   );
-  // }
-
   //AKA Value style
   static TextStyle inputFieldTextStyle(context) =>
       Theme.of(context).textTheme.subtitle2!.copyWith(

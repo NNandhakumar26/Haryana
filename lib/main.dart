@@ -92,6 +92,7 @@ class MyApp extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: 15, vertical: 10)),
           ),
         ),
+
         textTheme: Style.textTheme,
         scaffoldBackgroundColor: Colors.white,
         //TODO: Read the documentation
