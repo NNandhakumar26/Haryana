@@ -40,6 +40,10 @@ class FullTextField extends StatelessWidget {
               ),
               maxLines: multiLine,
               onChanged: (String text) {
+                if (onChanged != null) {
+                  return onChanged!(text);
+
+                }
                 // onChanged!(text);
               },
               cursorColor: Style.primary,

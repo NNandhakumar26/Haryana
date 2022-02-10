@@ -28,6 +28,9 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: 'Full Name',
                   fieldWidget: FullTextField(
                     title: 'First Last Name',
+                    onChanged: (String value) {
+                      doctor!.doctorName = value;
+                    },
                   ),
                 ),
                 // Align(
@@ -68,11 +71,17 @@ class DoctorRegistrationPage extends StatelessWidget {
                     title: 'DD-MM-YY',
                   ),
                 ),
+
                 TitleInputFieldWidget(
                   title: 'Age',
                   fieldWidget: FullTextField(
                     inputType: TextInputType.number,
                     title: 'In yrs',
+                    onChanged: (String value) {
+                      if (int.tryParse(value) != null) {
+                        doctor!.doctorAge = int.parse(value);
+                      }
+                    },
                   ),
                 ),
 
@@ -81,6 +90,52 @@ class DoctorRegistrationPage extends StatelessWidget {
                   fieldWidget: FullTextField(
                     inputType: TextInputType.number,
                     title: 'In years',
+                    onChanged: (String value) {
+                      doctor!.doctorExperience = value;
+                    },
+                  ),
+                ),
+
+                TitleInputFieldWidget(
+                  title: 'Address',
+                  fieldWidget: FullTextField(
+                    title: 'House No, Street, Area',
+                    onChanged: (String value) {
+                      doctor!.doctorAddress!.streetName = value;
+                    },
+                  ),
+                ),
+
+                TitleInputFieldWidget(
+                  title: 'City',
+                  fieldWidget: FullTextField(
+                    title: 'City Name',
+                    onChanged: (String value) {
+                      doctor!.doctorAddress!.city = value;
+                    },
+                  ),
+                ),
+
+                TitleInputFieldWidget(
+                  title: 'State',
+                  fieldWidget: FullTextField(
+                    title: 'State Name',
+                    onChanged: (String value) {
+                      doctor!.doctorAddress!.state = value;
+                    },
+                  ),
+                ),
+
+                TitleInputFieldWidget(
+                  title: 'Pincode',
+                  fieldWidget: FullTextField(
+                    inputType: TextInputType.number,
+                    title: 'In number',
+                    onChanged: (String value) {
+                      if (int.tryParse(value) != null) {
+                        doctor!.doctorAddress!.pincode = int.parse(value);
+                      }
+                    },
                   ),
                 ),
 
@@ -88,13 +143,30 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: 'Specialist',
                   fieldWidget: FullTextField(
                     title: 'Occupation',
+                    onChanged: (String value) {
+                      doctor!.doctorSpecialization = value;
+                    },
+                  ),
+                ),
+
+                TitleInputFieldWidget(
+                  title: 'Qualification',
+                  fieldWidget: FullTextField(
+                    title: 'Degree',
+                    onChanged: (String value) {
+                      doctor!.doctorQualification = value;
+                    },
                   ),
                 ),
 
                 TitleInputFieldWidget(
                   title: 'Email Address',
                   fieldWidget: FullTextField(
+                    inputType: TextInputType.emailAddress,
                     title: 'Email',
+                    onChanged: (String value) {
+                      doctor!.doctorEmail = value;
+                    },
                   ),
                 ),
 
@@ -103,6 +175,11 @@ class DoctorRegistrationPage extends StatelessWidget {
                   fieldWidget: FullTextField(
                     inputType: TextInputType.number,
                     title: '9876543210',
+                    onChanged: (String value) {
+                      if (int.tryParse(value) != null) {
+                        doctor!.doctorPhoneNo = int.parse(value);
+                      }
+                    },
                   ),
                 ),
 
@@ -110,8 +187,12 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: 'Hospital',
                   fieldWidget: FullTextField(
                     title: 'Hospital Name',
+                    onChanged: (String value) {
+                      doctor!.doctorHospital = value;
+                    },
                   ),
                 ),
+
                 FieldTitle(
                   text: 'Upload Picture',
                 ),
@@ -123,10 +204,17 @@ class DoctorRegistrationPage extends StatelessWidget {
                     title: '00:00AM - 00:00PM',
                   ),
                 ),
+
                 TitleInputFieldWidget(
                   title: 'OPD Fees',
                   fieldWidget: FullTextField(
+                    inputType: TextInputType.number,
                     title: 'In Rupees',
+                    onChanged: (String value) {
+                      if (double.tryParse(value) != null) {
+                        doctor!.doctorFees = double.parse(value);
+                      }
+                    },
                   ),
                 ),
               ],

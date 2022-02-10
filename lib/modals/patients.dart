@@ -4,8 +4,8 @@ import 'guardian.dart';
 
 class Patient {
   String? patientId;
-  String? name;
-  int? age;
+  String? patientname;
+  int? patientAge;
   String? patientPhoneNo;
   String? patientEmail;
   int? months;
