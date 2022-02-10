@@ -4,5 +4,5 @@ class Guardian {
   String? name;
   int? phoneNumber;
   int? phoneNumber2;
-  Address? address;
+  Address? guardianAddress;
 }

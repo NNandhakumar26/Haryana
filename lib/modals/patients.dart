@@ -12,7 +12,7 @@ class Patient {
   String? gender;
   DateTime? birthDate;
   Guardian? guardian;
-  Address? address;
+  Address? patientAddress;
   String? relationWithGuardian;
   String? reason;
   List<Appointments>? appointments;
