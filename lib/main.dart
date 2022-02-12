@@ -1,5 +1,7 @@
 import 'package:doctor_booking_application/Registration/doctor_registration.dart';
+import 'package:doctor_booking_application/Registration/hospital_registration.dart';
 import 'package:doctor_booking_application/modals/doctors.dart';
+import 'package:doctor_booking_application/modals/hospital.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
 
@@ -98,9 +100,10 @@ class MyApp extends StatelessWidget {
         //TODO: Read the documentation
         typography: Typography.material2018(),
       ),
-      home: DoctorRegistrationPage(
-        doctor: Doctor(),
-      ),
+      // home: DoctorRegistrationPage(
+      //   doctor: Doctor(),
+      // ),
+      home: HospitalformWidget(hospital: Hospital()),
     );
   }
 }

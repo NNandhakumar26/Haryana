@@ -1,9 +1,18 @@
 import 'address.dart';
+
 class Hospital {
-  String? name;
+  String? hospitalName;
   String? hospitalID;
   Address? hospitalAddress;
-  String? hospitalHelplineNo;
+  int? hospitalHelplineNo;
   String? hospitalEmail;
   String? hospitalType;
+  Hospital({
+    this.hospitalName,
+    this.hospitalID,
+    this.hospitalAddress,
+    this.hospitalHelplineNo,
+    this.hospitalEmail,
+    this.hospitalType,
+  });
 }
