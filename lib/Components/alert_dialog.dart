@@ -8,6 +8,7 @@ class CustomAlertDialog extends StatelessWidget {
   final Function? onDone;
   final String primaryButton;
   final String secondaryButton;
+  final bool noActions;
 
   CustomAlertDialog({
     required this.context,
@@ -16,6 +17,7 @@ class CustomAlertDialog extends StatelessWidget {
     this.onDone,
     this.primaryButton = 'Done',
     this.secondaryButton = 'Cancel',
+    this.noActions = false,
   });
   // const CustomAlertDialog({Key? key}) : super(key: key);
 
@@ -33,44 +35,46 @@ class CustomAlertDialog extends StatelessWidget {
       content: Column(
         children: columnWidgets,
       ),
-      actions: [
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.all(16),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(
-            secondaryButton,
-            style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                  color: Style.primary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+      actions: !(noActions)
+          ? [
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.all(16),
                 ),
-          ),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            primary: Style.primary.withOpacity(0.87),
-            padding: EdgeInsets.all(8),
-          ),
-          child: Text(
-            primaryButton,
-            style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                  color: Colors.white.withOpacity(0.87),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  secondaryButton,
+                  style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                        color: Style.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
-          ),
-          onPressed: () {
-            if (onDone != null) {
-              onDone!();
-            } else
-              Navigator.pop(context);
-          },
-        ),
-      ],
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Style.primary.withOpacity(0.87),
+                  padding: EdgeInsets.all(8),
+                ),
+                child: Text(
+                  primaryButton,
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                        color: Colors.white.withOpacity(0.87),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                ),
+                onPressed: () {
+                  if (onDone != null) {
+                    onDone!();
+                  } else
+                    Navigator.pop(context);
+                },
+              ),
+            ]
+          : [SizedBox.shrink()],
     );
   }
 }

@@ -1,5 +1,4 @@
-
-
+import '../Registration/doctor_registration.dart';
 import 'address.dart';
 
 class Doctor {
@@ -17,6 +16,7 @@ class Doctor {
   String? doctorGender;
   int? doctorTiming;
   String? doctorHospital;
+  List<Slot>? slots;
   Doctor({
     this.doctorID,
     this.doctorName,
@@ -32,5 +32,6 @@ class Doctor {
     this.doctorGender,
     this.doctorTiming,
     this.doctorHospital,
+    this.slots,
   });
 }

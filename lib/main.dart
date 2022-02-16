@@ -1,24 +1,46 @@
 import 'package:doctor_booking_application/Registration/doctor_registration.dart';
 import 'package:doctor_booking_application/Registration/hospital_registration.dart';
+import 'package:doctor_booking_application/first_page/first_page.dart';
 import 'package:doctor_booking_application/modals/doctors.dart';
 import 'package:doctor_booking_application/modals/hospital.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'Registration/registration_main.dart';
+
+void main() async {
+  // await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  //Added Everything
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      showPerformanceOverlay: false,
       theme: ThemeData(
-        primarySwatch: Style.primary,
         primaryColor: Style.primaryColor,
+        textTheme: Style.textTheme,
+
+        timePickerTheme: TimePickerThemeData(
+          backgroundColor: Colors.white,
+          dialTextColor: Colors.black54,
+          helpTextStyle: Theme.of(context).textTheme.headline6,
+        ),
+        checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateProperty.all(Colors.white),
+          fillColor: MaterialStateProperty.all(Style.primaryColor),
+        ),
+        radioTheme: RadioThemeData(
+          overlayColor:
+              MaterialStateProperty.all(Theme.of(context).primaryColor),
+          fillColor: MaterialStateProperty.all(Style.primaryColor),
+        ),
         inputDecorationTheme: InputDecorationTheme(
           labelStyle: Theme.of(context).textTheme.bodyText1!.copyWith(
                 fontFamily: 'Lexend Deca',
@@ -26,12 +48,12 @@ class MyApp extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
               ),
-          hintStyle: Theme.of(context).textTheme.bodyText1!.copyWith(
-                fontFamily: 'Lexend Deca',
-                color: Color(0xFF57636C),
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-              ),
+          hintStyle: Style.textTheme.caption!.copyWith(
+            color: Colors.black26,
+            fontSize: 12,
+            letterSpacing: 0.4,
+            fontWeight: FontWeight.normal,
+          ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
               color: Color(0xFFDBE2E7),
@@ -48,7 +70,7 @@ class MyApp extends StatelessWidget {
           ),
           filled: true,
           fillColor: Colors.white,
-          contentPadding: EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
 
         colorScheme: ColorScheme(
@@ -76,10 +98,12 @@ class MyApp extends StatelessWidget {
             ),
             backgroundColor: MaterialStateProperty.all(Style.primaryColor),
             padding: MaterialStateProperty.all(
-                EdgeInsets.symmetric(horizontal: 15, vertical: 10)),
+              EdgeInsets.symmetric(
+                horizontal: 40,
+              ),
+            ),
           ),
         ),
-        //Text button for primary colour
         textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
             shape: MaterialStateProperty.all(StadiumBorder()),
@@ -95,15 +119,16 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        textTheme: Style.textTheme,
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Color.fromARGB(255, 240, 241, 241),
         //TODO: Read the documentation
         typography: Typography.material2018(),
       ),
       // home: DoctorRegistrationPage(
       //   doctor: Doctor(),
       // ),
-      home: HospitalformWidget(hospital: Hospital()),
+      home: RegistrationMainPage(),
+      // home: FirstPage(),
+      // home: HospitalformWidget(hospital: Hospital()),
     );
   }
 }
