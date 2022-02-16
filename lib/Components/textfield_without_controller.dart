@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class FullTextField extends StatelessWidget {
   final String? title;
   final Function? onChanged;
+  final Function? onSaved;
   final String initialValue;
   final IconData? icon;
   final int multiLine;
@@ -15,6 +16,7 @@ class FullTextField extends StatelessWidget {
     this.initialValue = '',
     // required this.onChanged,
     this.onChanged,
+    this.onSaved,
     this.icon,
     this.multiLine = 1,
     this.controller,
@@ -25,16 +27,13 @@ class FullTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 10,
+        horizontal: 8,
+        vertical: 8,
       ),
       child: (controller == null)
           ? TextFormField(
               initialValue: initialValue,
               keyboardType: inputType,
-              // decoration: Style.inputFieldDecorationWithoutLabel(
-              //   title: title!,
-              // ).copyWith(),
               decoration: InputDecoration().copyWith(
                 hintText: title,
               ),
@@ -42,15 +41,18 @@ class FullTextField extends StatelessWidget {
               onChanged: (String text) {
                 if (onChanged != null) {
                   return onChanged!(text);
-
                 }
-                // onChanged!(text);
               },
-              cursorColor: Style.primary,
-              style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                    color: Style.primary,
-                    letterSpacing: 0.8,
-                    fontWeight: FontWeight.w700,
+              onSaved: (value) {
+                if (onSaved != null) {
+                  return onSaved!(value);
+                }
+              },
+              cursorColor: Theme.of(context).primaryColor,
+              style: Theme.of(context).textTheme.headline6!.copyWith(
+                    fontSize: 16,
+                    color: Style.darkerText,
+                    fontWeight: FontWeight.w600,
                   ),
             )
           : TextFormField(
