@@ -1,21 +1,11 @@
-import 'package:doctor_booking_application/Template/styles/colors.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
-
-import '../styles/styles.dart';
-
-class ScheduleTab extends StatefulWidget {
-  const ScheduleTab({Key? key}) : super(key: key);
-
-  @override
-  State<ScheduleTab> createState() => _ScheduleTabState();
-}
 
 enum FilterStatus { Upcoming, Complete, Cancel }
 
 List<Map> schedules = [
   {
-    'img': 'assets/images/doctor.jpg',
+    'img': 'assets/images/patient.jpg',
     'doctorName': 'Mr. John Doe',
     'doctorTitle': 'Dental Checkup',
     'reservedDate': 'Monday, Aug 29',
@@ -23,7 +13,7 @@ List<Map> schedules = [
     'status': FilterStatus.Upcoming
   },
   {
-    'img': 'assets/images/doctor.jpg',
+    'img': 'assets/images/patient.jpg',
     'doctorName': 'Mr. Mauldya Imran',
     'doctorTitle': 'Skin Checkup',
     'reservedDate': 'Monday, Sep 29',
@@ -31,7 +21,7 @@ List<Map> schedules = [
     'status': FilterStatus.Upcoming
   },
   {
-    'img': 'assets/images/doctor.jpg',
+    'img': 'assets/images/patient.jpg',
     'doctorName': 'Mr. Rihanna Garland',
     'doctorTitle': 'General Checkup',
     'reservedDate': 'Monday, Jul 29',
@@ -39,7 +29,31 @@ List<Map> schedules = [
     'status': FilterStatus.Upcoming
   },
   {
-    'img': 'assets/images/doctor.jpg',
+    'img': 'assets/images/patient.jpg',
+    'doctorName': 'Mr. John Doe',
+    'doctorTitle': 'Dental Checkup',
+    'reservedDate': 'Monday, Aug 29',
+    'reservedTime': '11:00 - 12:00',
+    'status': FilterStatus.Upcoming
+  },
+  {
+    'img': 'assets/images/patient.jpg',
+    'doctorName': 'Mr. Mauldya Imran',
+    'doctorTitle': 'Skin Checkup',
+    'reservedDate': 'Monday, Sep 29',
+    'reservedTime': '11:00 - 12:00',
+    'status': FilterStatus.Upcoming
+  },
+  {
+    'img': 'assets/images/patient.jpg',
+    'doctorName': 'Mr. Rihanna Garland',
+    'doctorTitle': 'General Checkup',
+    'reservedDate': 'Monday, Jul 29',
+    'reservedTime': '11:00 - 12:00',
+    'status': FilterStatus.Upcoming
+  },
+  {
+    'img': 'assets/images/patient.jpg',
     'doctorName': 'Mr. John Doe',
     'doctorTitle': 'Something Related to Skin',
     'reservedDate': 'Monday, Jul 29',
@@ -47,7 +61,7 @@ List<Map> schedules = [
     'status': FilterStatus.Complete
   },
   {
-    'img': 'assets/images/doctor.jpg',
+    'img': 'assets/images/patient.jpg',
     'doctorName': 'Mr. Sam Smithh',
     'doctorTitle': 'Unknown',
     'reservedDate': 'Monday, Jul 29',
@@ -55,7 +69,7 @@ List<Map> schedules = [
     'status': FilterStatus.Cancel
   },
   {
-    'img': 'assets/images/doctor.jpg',
+    'img': 'assets/images/patient.jpg',
     'doctorName': 'Mr. Sam Smithh',
     'doctorTitle': 'Skin Irritation',
     'reservedDate': 'Monday, Jul 29',
@@ -64,129 +78,286 @@ List<Map> schedules = [
   },
 ];
 
-class _ScheduleTabState extends State<ScheduleTab> {
-  FilterStatus status = FilterStatus.Upcoming;
-  Alignment _alignment = Alignment.centerLeft;
+//include sliver app bar
+class SecondPageMain extends StatefulWidget {
+  SecondPageMain({Key? key}) : super(key: key);
+
+  @override
+  State<SecondPageMain> createState() => _SecondPageMainState();
+}
+
+class _SecondPageMainState extends State<SecondPageMain> {
+  final FilterStatus status = FilterStatus.Upcoming;
+
+  final scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    List<Map> filteredSchedules = schedules.where((var schedule) {
-      return schedule['status'] == status;
-    }).toList();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 4,
+    return DefaultTabController(
+      length: 3,
+      initialIndex: 0,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white.withOpacity(0.98),
             ),
-            child: Text(
-              'Schedule',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headline6,
+            onPressed: () => Navigator.pop(context),
+            // onPressed: () => mainPageScaffoldKey.currentState!.openDrawer(),
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.search,
+                color: Colors.white.withOpacity(0.98),
+              ),
+              onPressed: () {},
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.08),
+            // IconButton(
+            //   icon: Icon(
+            //     Icons.more_vert,
+            //     color: Colors.black,
+            //   ),
+            //   onPressed: () {},
+            // ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Style.primary.shade50.withOpacity(0.87),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              margin: EdgeInsets.all(4),
+              padding: EdgeInsets.all(4),
+              child: TabBar(
+                unselectedLabelStyle: Theme.of(context).textTheme.bodyText2,
+                labelColor: Colors.white.withOpacity(0.98),
+                unselectedLabelColor: Colors.black87,
+                labelStyle: Theme.of(context).textTheme.button!.copyWith(
+                      color: Colors.white,
+                    ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    width: 0,
+                    color: Colors.transparent,
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    for (FilterStatus filterStatus in FilterStatus.values)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (filterStatus == FilterStatus.Upcoming) {
-                                status = FilterStatus.Upcoming;
-                                _alignment = Alignment.centerLeft;
-                              } else if (filterStatus ==
-                                  FilterStatus.Complete) {
-                                status = FilterStatus.Complete;
-                                _alignment = Alignment.center;
-                              } else if (filterStatus == FilterStatus.Cancel) {
-                                status = FilterStatus.Cancel;
-                                _alignment = Alignment.centerRight;
-                              }
-                            });
-                          },
-                          child: Center(
-                            child: Text(
-                              filterStatus.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle2!
-                                  .copyWith(
-                                    color: Colors.black26,
-                                    letterSpacing: 0.60,
-                                  ),
-                            ),
-                          ),
-                        ),
+                indicatorColor: Theme.of(context).primaryColor,
+                onTap: (value) {
+                  scrollController.animateTo(
+                    double.parse(value.toString()),
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                tabs: FilterStatus.values
+                    .map(
+                      (e) => Tab(
+                        text: e.name,
                       ),
+                    )
+                    .toList(),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TabBarView(
+                  children: [
+                    ...FilterStatus.values
+                        .map(
+                          (filterValue) => schedules.where(
+                            (schedule) {
+                              return schedule['status'] == filterValue;
+                            },
+                          ),
+                        )
+                        .toList()
+                        .map(
+                          (value) => ListView(
+                            controller: scrollController,
+                            children: value
+                                .map(
+                                  (e) => AppointmentWidget(
+                                    isLastElement: false,
+                                    schedule: e,
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        )
+                        .toList(),
                   ],
                 ),
               ),
-              AnimatedAlign(
-                duration: Duration(milliseconds: 200),
-                alignment: _alignment,
-                child: Container(
-                  width: 100,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Text(
-                      status.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredSchedules.length,
-              itemBuilder: (context, index) {
-                var _schedule = filteredSchedules[index];
-                bool isLastElement = filteredSchedules.length + 1 == index;
-                return AppointmentWidget(
-                  isLastElement: isLastElement,
-                  schedule: _schedule,
-                );
-              },
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+
+// class Temp extends StatelessWidget {
+
+//  SliverAppBar(
+//           snap: true,
+//           pinned: false,
+//           floating: true,
+//           leading: IconButton(
+//             onPressed: () => mainPageScaffoldKey.currentState!.openDrawer(),
+//             icon: Icon(
+//               Icons.menu,
+//               color: Colors.white.withOpacity(0.98),
+//             ),
+//           ),
+//           actions: [
+//             IconButton(
+//               onPressed: () {},
+//               icon: Icon(
+//                 Icons.search,
+//                 color: Colors.white,
+//               ),
+//             ),
+//           ],
+//         ),
+
+// SliverToBoxAdapter(
+//   child: Container(
+//     height: 5000,
+//   ),
+//   // child: Container(
+//   //   height: MediaQuery.of(context).size.height,
+//   //   padding: const EdgeInsets.all(14.0),
+//   //   child: TabBarView(
+//   //     children: [
+//   //       ...FilterStatus.values
+//   //           .map(
+//   //             (filterValue) => schedules.where(
+//   //               (schedule) {
+//   //                 return schedule['status'] == filterValue;
+//   //               },
+//   //             ),
+//   //           )
+//   //           .map(
+//   //             (filteredSchedules) => ListView.builder(
+//   //               itemCount: filteredSchedules.length,
+//   //               itemBuilder: (context, index) {
+//   //                 var _schedule = filteredSchedules.elementAt(index);
+//   //                 bool isLastElement =
+//   //                     filteredSchedules.length + 1 == index;
+//   //                 return AppointmentWidget(
+//   //                   isLastElement: isLastElement,
+//   //                   schedule: _schedule,
+//   //                 );
+//   //               },
+//   //             ),
+//   //           ),
+//   //     ],
+//   //   ),
+//   // ),
+// ),
+//   const Temp({Key? key}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         16.height,
+//         TitleView(
+//           title: 'Today\'s Schedule',
+//           subtitle: ' ',
+//           onPressed: () {},
+//         ),
+//         //Include the searchbar
+//         Container(
+//           width: double.infinity,
+//           height: 40,
+//           padding: EdgeInsets.all(1),
+//           decoration: BoxDecoration(
+//             color: Style.primary.shade50.withOpacity(0.87),
+//             borderRadius: BorderRadius.circular(20),
+//           ),
+//           margin: EdgeInsets.symmetric(
+//             horizontal: 8,
+//             vertical: 8,
+//           ),
+//           child: TabBar(
+//             unselectedLabelStyle: Theme.of(context).textTheme.bodyText2,
+//             labelColor: Colors.white.withOpacity(0.98),
+//             unselectedLabelColor: Colors.black87,
+//             labelStyle: Theme.of(context).textTheme.button!.copyWith(
+//                   color: Colors.white,
+//                 ),
+//             indicatorSize: TabBarIndicatorSize.tab,
+//             indicator: BoxDecoration(
+//               color: Theme.of(context).primaryColor,
+//               borderRadius: BorderRadius.circular(20),
+//               border: Border.all(
+//                 width: 0,
+//                 color: Colors.transparent,
+//               ),
+//             ),
+//             indicatorColor: Theme.of(context).primaryColor,
+//             onTap: (value) {
+//               // scrollController.animateTo(
+//               //   double.parse(value.toString()),
+//               //   duration: Duration(milliseconds: 300),
+//               //   curve: Curves.easeInOut,
+//               // );
+//             },
+//             tabs: FilterStatus.values
+//                 .map(
+//                   (e) => Tab(
+//                     text: e.name,
+//                   ),
+//                 )
+//                 .toList(),
+//           ),
+//         ),
+//         Expanded(
+//           child: Padding(
+//             padding: const EdgeInsets.all(14.0),
+//             child: TabBarView(
+//               children: [
+//                 ...FilterStatus.values
+//                     .map(
+//                       (filterValue) => schedules.where(
+//                         (schedule) {
+//                           return schedule['status'] == filterValue;
+//                         },
+//                       ),
+//                     )
+//                     .map(
+//                       (filteredSchedules) => ListView.builder(
+//                         itemCount: filteredSchedules.length,
+//                         itemBuilder: (context, index) {
+//                           var _schedule = filteredSchedules.elementAt(index);
+//                           bool isLastElement =
+//                               filteredSchedules.length + 1 == index;
+//                           return AppointmentWidget(
+//                             isLastElement: isLastElement,
+//                             schedule: _schedule,
+//                           );
+//                         },
+//                       ),
+//                     ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class AppointmentWidget extends StatelessWidget {
   const AppointmentWidget({
@@ -285,25 +456,22 @@ class RowHalfButton extends StatelessWidget {
     return Expanded(
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.all(12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-            side: BorderSide(
-              color: Colors.black45,
-              width: 0.87,
+            padding: EdgeInsets.all(12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(
+                color: Colors.black45,
+                width: 0.87,
+              ),
             ),
-          ),
-          backgroundColor: (isPrimary)
-              ? Theme.of(context).primaryColor
-              : Theme.of(context).primaryColor.withOpacity(0.02),
-        ),
+            backgroundColor: (isPrimary)
+                ? Theme.of(context).primaryColor
+                : Style.primary.shade50.withOpacity(0.72)),
         child: Text(
           text,
           style: Theme.of(context).textTheme.button!.copyWith(
-                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color:
-                    (isPrimary) ? Colors.white : Theme.of(context).primaryColor,
+                color: (isPrimary) ? Colors.white : Style.primary.shade700,
               ),
         ),
         onPressed: () {},
@@ -354,11 +522,13 @@ class RowIconWithText extends StatelessWidget {
   final IconData icon;
   final String value;
   final bool isWhiteText;
+  final bool blackText;
   const RowIconWithText({
     Key? key,
     required this.icon,
     required this.value,
     this.isWhiteText = false,
+    this.blackText = false,
   }) : super(key: key);
 
   @override
@@ -369,7 +539,9 @@ class RowIconWithText extends StatelessWidget {
           icon,
           color: (isWhiteText)
               ? Colors.white.withOpacity(0.87)
-              : Theme.of(context).primaryColor,
+              : (blackText)
+                  ? Style.darkText
+                  : Theme.of(context).primaryColor,
           size: 15,
         ),
         SizedBox(
@@ -379,9 +551,12 @@ class RowIconWithText extends StatelessWidget {
           value,
           style: Theme.of(context).textTheme.bodyText1!.copyWith(
                 fontSize: 12,
+                // letterSpacing: 0.4,
                 color: (isWhiteText)
                     ? Colors.white
-                    : Theme.of(context).primaryColor,
+                    : (blackText)
+                        ? Colors.black54
+                        : Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
               ),
         ),

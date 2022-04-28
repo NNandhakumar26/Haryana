@@ -1,4 +1,4 @@
-class Appointments {
+class BookAppointments {
   String? appointmentID;
   DateTime? plannedDateTime;
   DateTime? actualDateTime;

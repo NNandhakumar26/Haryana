@@ -36,6 +36,12 @@ class FullTextField extends StatelessWidget {
               keyboardType: inputType,
               decoration: InputDecoration().copyWith(
                 hintText: title,
+                prefixIcon: (icon != null)
+                    ? Icon(
+                        icon,
+                        color: Colors.black12,
+                      )
+                    : null,
               ),
               maxLines: multiLine,
               onChanged: (String text) {
@@ -58,11 +64,11 @@ class FullTextField extends StatelessWidget {
           : TextFormField(
               controller: controller,
               keyboardType: inputType,
-
-              // initialValue: initialValue,
-              decoration: InputDecoration().copyWith(
-                hintText: title,
-              ),
+              decoration: (multiLine == 1)
+                  ? InputDecoration().copyWith(
+                      hintText: title,
+                    )
+                  : Style.customBorderFieldDecoration(context, multiLine),
               maxLines: multiLine,
               onChanged: (String text) {
                 // onChanged(text);

@@ -30,7 +30,7 @@ class _HomeState extends State<Home> {
       HomeTab(
         onPressedScheduleCard: goToSchedule,
       ),
-      ScheduleTab(),
+      SecondPageMain(),
     ];
 
     return Scaffold(

@@ -1,36 +1,27 @@
-import 'package:doctor_booking_application/Registration/doctor_registration.dart';
-import 'package:doctor_booking_application/Registration/hospital_registration.dart';
-import 'package:doctor_booking_application/Template/tabs/ScheduleTab.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:doctor_booking_application/Widgets/boucing_button.dart';
-import 'package:doctor_booking_application/constants.dart';
-import 'package:doctor_booking_application/main_page.dart';
-import 'package:doctor_booking_application/modals/hospital.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
-import '../modals/doctors.dart';
 
-class RegistrationMainPage extends StatefulWidget {
-  RegistrationMainPage({Key? key}) : super(key: key);
+class ModernUIWidget extends StatelessWidget {
+  final List<String> titleList;
+  final int currentIndex;
+  final List<Widget> widgetList;
+  final String buttonText;
+  final VoidCallback onPressed;
 
-  @override
-  State<RegistrationMainPage> createState() => _RegistrationMainPageState();
-}
-
-class _RegistrationMainPageState extends State<RegistrationMainPage> {
-  int index = 0;
-
-  final titles = <String>[
-    'Hospital Registration Form',
-    'Approval Page',
-    'Doctor Registration Form',
-    'Get Started',
-  ];
+  const ModernUIWidget({
+    Key? key,
+    required this.titleList,
+    required this.currentIndex,
+    required this.widgetList,
+    required this.buttonText,
+    required this.onPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: registrationScreenScaffoldKey,
       backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -65,18 +56,18 @@ class _RegistrationMainPageState extends State<RegistrationMainPage> {
                                     ControlsDetails details) =>
                                 SizedBox.shrink(),
                             steps: [
-                              for (var i = 0; i < 4; i++)
+                              for (var i = 0; i < titleList.length; i++)
                                 Step(
                                   title: Text(''),
                                   content: SizedBox.shrink(),
                                   state: StepState.disabled,
-                                  isActive: (i <= index) ? true : false,
+                                  isActive: (i <= currentIndex) ? true : false,
                                 ),
                             ],
                           ),
                         ),
                         Text(
-                          titles[index],
+                          titleList[currentIndex],
                           style:
                               Theme.of(context).textTheme.headline6!.copyWith(
                                     fontWeight: FontWeight.w600,
@@ -114,7 +105,7 @@ class _RegistrationMainPageState extends State<RegistrationMainPage> {
                                 horizontal: 16,
                                 vertical: 16,
                               ),
-                              child: CenterDisplayWidget(index: index),
+                              child: widgetList[currentIndex],
                             ),
                           ),
                         ),
@@ -127,26 +118,9 @@ class _RegistrationMainPageState extends State<RegistrationMainPage> {
                             child: Container(
                               height: 48,
                               child: BouncingButton(
-                                voidCallback: () async {
-                                  if (index < 3) {
-                                    setState(
-                                      () {
-                                        index++;
-                                      },
-                                    );
-                                  } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (builder) => MainPage(
-                                          doctorLogin: false,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
+                                voidCallback: () => onPressed(),
                                 isWhiteButton: true,
-                                title: 'Update',
+                                title: buttonText,
                               ),
                             ),
                           ),
@@ -154,87 +128,11 @@ class _RegistrationMainPageState extends State<RegistrationMainPage> {
                       ],
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CenterDisplayWidget extends StatelessWidget {
-  final int index;
-  const CenterDisplayWidget({Key? key, required this.index}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    switch (index) {
-      case 0:
-        return HospitalformWidget(
-          hospital: Hospital(),
-        );
-      case 1:
-        return ApprovalPage();
-      case 2:
-        return DoctorRegistrationPage(
-          doctor: Doctor(slots: []),
-        );
-      case 3:
-        // return CustomSlotBuilderWidget();
-        //Display The message from the server
-        return ApprovalPage();
-      default:
-        return Container();
-    }
-  }
-}
-
-class ApprovalPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FadeInDown(
-            delay: Duration(milliseconds: 200),
-            duration: Duration(milliseconds: 600),
-            from: 50,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Approval Staus',
-                style: Theme.of(context).textTheme.headline6!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Style.darkerText,
-                    ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 32,
-          ),
-          FadeInDown(
-            delay: Duration(milliseconds: 600),
-            duration: Duration(milliseconds: 500),
-            from: 50,
-            child: Text(
-              //TODO:Get the approval status from the database...
-              'Waiting for approval',
-              style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Style.darkText,
-                  ),
-            ),
-          ),
-          SizedBox(
-            height: 8,
-          ),
-        ],
       ),
     );
   }

@@ -1,5 +1,5 @@
-import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bounce/flutter_bounce.dart';
 
 class BouncingButton extends StatelessWidget {
   final String title;
@@ -21,9 +21,8 @@ class BouncingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BouncingWidget(
-      scaleFactor: _scaleFactor,
-      // duration: Duration(milliseconds: 500),
+    return Bounce(
+      duration: Duration(milliseconds: 164),
       onPressed: () => _onPressed(context),
       child: Container(
         height: 54,

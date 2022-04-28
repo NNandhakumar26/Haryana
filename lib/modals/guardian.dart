@@ -1,4 +1,4 @@
-import 'address.dart';
+import 'package:doctor_booking_application/modals/person.dart';
 
 class Guardian {
   String? name;

@@ -1,0 +1,572 @@
+import 'package:animate_do/animate_do.dart';
+import 'package:badges/badges.dart';
+import 'package:doctor_booking_application/book_appoinment/available_doctor.dart';
+import 'package:doctor_booking_application/book_appoinment/book_slot.dart';
+import 'package:flutter/material.dart';
+import '../Components/company_appbar.dart';
+import '../Components/textfield_without_controller.dart';
+import '../style.dart';
+
+class BookAppoinmentPage extends StatefulWidget {
+  @override
+  State<BookAppoinmentPage> createState() => _BookAppoinmentPageState();
+}
+
+class _BookAppoinmentPageState extends State<BookAppoinmentPage> {
+  String searchText = '';
+
+  final listOfServices = <String>[
+    'Gerontology (BCG)',
+    'Mental Health (BCMH)',
+    'Pediatrics (BCP)',
+    'Physical Rehabilitation (BCPR)',
+    'Driving and Community Mobility (SCDCM or SCDCM-A)',
+    'Environmental Modification (SCEM or SCEM-A)',
+    'Feeding, Eating, and Swallowing (SCFES or SCFES-A)',
+    'Low Vision (SCLV or SCLV-A)',
+    'School Systems (SCSS or SCSS-A),',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        child: CompanyAppbar(title: 'Choose Specialization'),
+        preferredSize: Size(double.infinity, 60),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(4),
+            child: FullTextField(
+              title: 'Enter Service Name',
+              icon: Icons.search,
+              onChanged: (value) {
+                setState(
+                  () {
+                    searchText = value;
+                  },
+                );
+              },
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: listOfServices
+                    .where((service) => service
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()))
+                    .map(
+                      (element) => Column(
+                        children: [
+                          ListTile(
+                            title: Text(
+                              element,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle2!
+                                  .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Style.darkText.withOpacity(0.87),
+                                  ),
+                            ),
+                            onTap: () {
+                              searchText = '';
+                              FocusManager.instance.primaryFocus!.unfocus();
+                              Style.AnimatedNavigation(
+                                context,
+                                AvailableDoctorPage(),
+                              );
+                            },
+                          ),
+                          Divider(
+                            thickness: 0.24,
+                            indent: 16,
+                            endIndent: 16,
+                            color: Colors.grey.shade400,
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ImageWithChipWidget extends StatelessWidget {
+  const ImageWithChipWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 32,
+        foregroundImage: AssetImage('assets/images/doctor.jpg'),
+      ),
+      minLeadingWidth: 0,
+      title: Align(
+        alignment: Alignment.centerLeft,
+        child: CustomChip(
+          text: 'Child Specialist',
+        ),
+      ),
+    );
+  }
+}
+
+class CustomChip extends StatelessWidget {
+  final String text;
+  const CustomChip({
+    Key? key,
+    required this.text,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      backgroundColor: Style.primary.shade50.withOpacity(0.48),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: Colors.transparent,
+          width: 0.0,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      elevation: 0,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      label: Badge(
+        elevation: 0,
+        borderSide: BorderSide.none,
+        badgeColor: Colors.green.shade400,
+        alignment: Alignment.centerRight,
+        position: BadgePosition.bottomStart(
+          bottom: 5.8,
+        ),
+        shape: BadgeShape.circle,
+        padding: EdgeInsets.all(3.2),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                  color: Style.darkerText.withOpacity(0.72),
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DoctorPage extends StatelessWidget {
+  const DoctorPage({Key? key}) : super(key: key);
+
+  String dateValue(String value) {
+    switch (value) {
+      case 'Tomorrow':
+        return DateTime.now().add(Duration(days: 1)).toString().split(' ')[0];
+      case 'Day After':
+        return DateTime.now().add(Duration(days: 2)).toString().split(' ')[0];
+      default:
+        return DateTime.now().toString().split(' ')[0];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBody: true,
+      bottomNavigationBar: FadeInUp(
+        delay: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 600),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Style.primary.shade100,
+              width: 0.24,
+            ),
+            borderRadius: BorderRadius.circular(48),
+            color: Style.primary.shade800,
+            boxShadow: [
+              BoxShadow(
+                color: Style.primary.shade400.withOpacity(0.4),
+                blurRadius: 8,
+                spreadRadius: -4,
+                offset: Offset(0, 8),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          margin: EdgeInsets.all(8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: RichText(
+                  text: TextSpan(
+                      text: 'Waiting Number : ',
+                      style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                            color: Colors.white.withOpacity(0.72),
+                            letterSpacing: 0.8,
+                          ),
+                      children: [
+                        TextSpan(
+                          text: '5',
+                          style:
+                              Theme.of(context).textTheme.headline6!.copyWith(
+                                    color: Colors.white.withOpacity(0.98),
+                                  ),
+                        ),
+                      ]),
+                ),
+              ),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                ),
+                onPressed: () => Style.AnimatedNavigation(
+                  context,
+                  BookSlotPage(),
+                ),
+                child: Text(
+                  'Book Slot',
+                  style: Theme.of(context).textTheme.button!.copyWith(
+                        color: Style.primary.shade600,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            snap: false,
+            pinned: true,
+            floating: false,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              background: Stack(
+                children: [
+                  Image.asset(
+                    'assets/images/background_doctor_image.jpg',
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Style.primary.shade800,
+                      gradient: LinearGradient(
+                        colors: [
+                          Style.primary.shade900,
+                          Style.primary.shade900.withOpacity(0.60),
+                          Style.primary.shade900.withOpacity(0.32),
+                          Colors.transparent,
+                          Colors.transparent,
+                        ],
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            expandedHeight: 230,
+            backgroundColor: Style.primary.shade900,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_rounded),
+              tooltip: 'Menu',
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.comment),
+                tooltip: 'Comment Icon',
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(Icons.settings),
+                tooltip: 'Setting Icon',
+                onPressed: () {},
+              ),
+            ],
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      height: 120,
+                      width: 120,
+                      margin: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Style.primary.shade700,
+                        // borderRadius: BorderRadius.circular(40),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: EdgeInsets.all(2),
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundImage: AssetImage('assets/images/doctor.jpg'),
+                      ),
+                    ),
+                    8.width,
+                    CustomChip(
+                      text: 'Child Specialist',
+                    ),
+                  ],
+                ),
+                InfoContainer(
+                  title: 'Dr. Murari Singh',
+                  rating: '4.5',
+                  isMain: true,
+                  subtitle1: 'No:52, Sannathy Street',
+                  subtitle2: 'Thirupathiripuliyur, Cuddalore.',
+                ),
+                8.height,
+                DefaultTabController(
+                  length: 3,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: TabBar(
+                          labelStyle:
+                              Theme.of(context).textTheme.subtitle2!.copyWith(),
+                          indicatorColor: Style.primary.shade600,
+                          indicatorSize: TabBarIndicatorSize.label,
+                          indicatorPadding: EdgeInsets.symmetric(horizontal: 4),
+                          indicatorWeight: 1.64,
+                          labelPadding: EdgeInsets.all(0),
+                          labelColor: Colors.black87,
+                          unselectedLabelStyle:
+                              Theme.of(context).textTheme.caption,
+                          unselectedLabelColor: Colors.black45,
+                          tabs: [
+                            ...['Today', 'Tomorrow', 'Day After']
+                                .map(
+                                  (e) => Tab(
+                                    icon: Text(e),
+                                    text: dateValue(e),
+                                  ),
+                                )
+                                .toList(),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height - 80,
+                        child: TabBarView(
+                          children: [
+                            Column(
+                              children: [
+                                for (var i = 0; i < 5; i++)
+                                  WaitingPatientContainer(i: i),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                for (var i = 0; i < 5; i++)
+                                  WaitingPatientContainer(i: i),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                for (var i = 0; i < 5; i++)
+                                  WaitingPatientContainer(i: i),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class WaitingPatientContainer extends StatelessWidget {
+  const WaitingPatientContainer({
+    Key? key,
+    required this.i,
+  }) : super(key: key);
+
+  final int i;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        leading: CircleAvatar(
+          backgroundColor: Style.primary.shade400,
+          child: Text(
+            i.toString(),
+            style: Theme.of(context).textTheme.headline6!.copyWith(
+                  color: Colors.white.withOpacity(0.98),
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+        title: Text(
+          'Random Name',
+          style: Theme.of(context).textTheme.headline6!.copyWith(
+                color: Colors.black87,
+                fontSize: 16,
+              ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Text(
+            'Might Delay',
+            style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                  color: Colors.black26,
+                ),
+          ),
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(
+              'Est. Time',
+              style: Theme.of(context).textTheme.caption!.copyWith(
+                    color: Colors.black45,
+                  ),
+            ),
+            Text(
+              '4:00 PM',
+              style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Style.primary.shade600,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class InfoContainer extends StatelessWidget {
+  final String title;
+  final String? subtitle1;
+  final String? subtitle2;
+  final String? rating;
+  final bool isMain;
+
+  const InfoContainer({
+    Key? key,
+    required this.title,
+    this.subtitle1,
+    this.subtitle2,
+    this.rating,
+    this.isMain = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  textScaleFactor: 1.24,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                        color: Style.primary.shade900,
+                        letterSpacing: 0.8,
+                        // fontSize: (isMain) ? 24 : 16,
+                      ),
+                ),
+                if (subtitle1 != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        12.height,
+                        Text(
+                          subtitle1 ??
+                              'No:52, Sannathy Street, Thirupadiripuliyur.',
+                          style:
+                              Theme.of(context).textTheme.subtitle2!.copyWith(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                        ),
+                        4.height,
+                        Text(
+                          subtitle2 ?? 'Cuddalore, Tamilnadu - 607 002.',
+                          style:
+                              Theme.of(context).textTheme.subtitle2!.copyWith(
+                                    color: Colors.black54,
+                                    fontSize: 12,
+                                  ),
+                        )
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: IconWithText(rating: rating),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class IconWithText extends StatelessWidget {
+  const IconWithText({
+    Key? key,
+    required this.rating,
+  }) : super(key: key);
+
+  final String? rating;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          Icons.star,
+          color: Colors.yellow.shade700,
+        ),
+        4.width,
+        Text(
+          rating ?? '4.5',
+          style: Theme.of(context).textTheme.subtitle2,
+        ),
+        4.width,
+      ],
+    );
+  }
+}
