@@ -4,19 +4,22 @@ import 'package:doctor_booking_application/Components/textfield_without_controll
 import 'package:doctor_booking_application/Registration/doctor_registration.dart';
 import 'package:doctor_booking_application/modals/doctors.dart';
 import 'package:doctor_booking_application/modals/hospital.dart';
+import 'package:doctor_booking_application/modals/person.dart';
 import 'package:flutter/material.dart';
 
-class HospitalformWidget extends StatelessWidget {
-  final Hospital? hospital;
+class HospitalRegistrationWidget extends StatelessWidget {
+  final Hospital hospital;
   final ValueNotifier<File?> image = ValueNotifier<File?>(null);
   final ValueNotifier<File?> hospitalLogo = ValueNotifier<File?>(null);
 
   final String? values = null;
 
-  HospitalformWidget({required this.hospital});
+  HospitalRegistrationWidget({required this.hospital});
 
   @override
   Widget build(BuildContext context) {
+    if (hospital.hospitalAddress == null) hospital.hospitalAddress = Address();
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: SingleChildScrollView(
@@ -28,8 +31,8 @@ class HospitalformWidget extends StatelessWidget {
               title: 'Hospital Name',
               fieldWidget: FullTextField(
                 title: 'Enter Hospital Name',
-                onSaved: (value) {
-                  hospital!.hospitalName = value;
+                onChanged: (value) {
+                  hospital.hospitalName = value;
                 },
               ),
             ),
@@ -37,8 +40,8 @@ class HospitalformWidget extends StatelessWidget {
               title: 'Hospital Type',
               fieldWidget: FullTextField(
                 title: 'Type of Hospital',
-                onSaved: (String value) {
-                  hospital!.hospitalType = value;
+                onChanged: (String value) {
+                  hospital.hospitalType = value;
                 },
               ),
             ),
@@ -87,9 +90,9 @@ class HospitalformWidget extends StatelessWidget {
               fieldWidget: FullTextField(
                 inputType: TextInputType.number,
                 title: 'HelpLine',
-                onSaved: (String value) {
+                onChanged: (String value) {
                   if (int.tryParse(value) != null) {
-                    hospital!.primaryContact = int.parse(value);
+                    hospital.primaryContact = int.parse(value);
                   }
                 },
               ),
@@ -99,9 +102,9 @@ class HospitalformWidget extends StatelessWidget {
               fieldWidget: FullTextField(
                 inputType: TextInputType.number,
                 title: 'HelpLine',
-                onSaved: (String value) {
+                onChanged: (String value) {
                   if (int.tryParse(value) != null) {
-                    hospital!.secondaryContact = int.parse(value);
+                    hospital.secondaryContact = int.parse(value);
                   }
                 },
               ),
@@ -111,8 +114,8 @@ class HospitalformWidget extends StatelessWidget {
               fieldWidget: FullTextField(
                 inputType: TextInputType.emailAddress,
                 title: 'email address',
-                onSaved: (String value) {
-                  hospital!.hospitalEmail = value;
+                onChanged: (String value) {
+                  hospital.hospitalEmail = value;
                 },
               ),
             ),
@@ -160,8 +163,8 @@ class HospitalformWidget extends StatelessWidget {
               title: 'Address',
               fieldWidget: FullTextField(
                 title: 'House no, Street, Area',
-                onSaved: (String value) {
-                  hospital!.hospitalAddress!.streetName = value;
+                onChanged: (String value) {
+                  hospital.hospitalAddress!.streetName = value;
                 },
               ),
             ),
@@ -169,8 +172,8 @@ class HospitalformWidget extends StatelessWidget {
               title: 'City',
               fieldWidget: FullTextField(
                 title: 'City Name',
-                onSaved: (String value) {
-                  hospital!.hospitalAddress!.city = value;
+                onChanged: (String value) {
+                  hospital.hospitalAddress!.city = value;
                 },
               ),
             ),
@@ -178,8 +181,8 @@ class HospitalformWidget extends StatelessWidget {
               title: 'State',
               fieldWidget: FullTextField(
                 title: 'State Full Name',
-                onSaved: (String value) {
-                  hospital!.hospitalAddress!.state = value;
+                onChanged: (String value) {
+                  hospital.hospitalAddress!.state = value;
                 },
               ),
             ),
@@ -188,9 +191,9 @@ class HospitalformWidget extends StatelessWidget {
               fieldWidget: FullTextField(
                 inputType: TextInputType.number,
                 title: 'In Number',
-                onSaved: (String value) {
+                onChanged: (String value) {
                   if (int.tryParse(value) != null) {
-                    hospital!.hospitalAddress!.pincode = int.parse(value);
+                    hospital.hospitalAddress!.pincode = int.parse(value);
                   }
                 },
               ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:doctor_booking_application/modals/appointment.dart';
 import 'package:doctor_booking_application/modals/person.dart';
 import 'package:doctor_booking_application/modals/slot.dart';
 
@@ -9,15 +10,16 @@ class Doctor {
   String? doctorID;
   Person? person;
   List<String>? specializations;
-  String? doctorQualification;
-  String? doctorExperience;
-  Address? doctorAddress;
+  String? Qualification;
+  String? Experience;
 
   // String? doctorSignature;
   double? doctorFees;
   int? doctorTiming;
-  String? doctorHospital;
-  List<Slot>? slots;
+  String? hospitalName;
+  String? hospitalId;
+
+  List<Appointment>? appointments;
   int? checkupDuration;
 
   Doctor({
@@ -25,13 +27,13 @@ class Doctor {
     this.doctorID,
     this.person,
     this.specializations,
-    this.doctorQualification,
-    this.doctorExperience,
-    this.doctorAddress,
+    this.Qualification,
+    this.Experience,
     this.doctorFees,
     this.doctorTiming,
-    this.doctorHospital,
-    this.slots,
+    this.hospitalName,
+    this.hospitalId,
+    this.appointments,
     this.checkupDuration,
   });
 
@@ -39,26 +41,26 @@ class Doctor {
     String? doctorID,
     Person? person,
     List<String>? specializations,
-    String? doctorQualification,
-    String? doctorExperience,
-    Address? doctorAddress,
+    String? Qualification,
+    String? Experience,
     double? doctorFees,
     int? doctorTiming,
-    String? doctorHospital,
-    List<Slot>? slots,
+    String? hospitalName,
+    String? hospitalId,
+    List<Appointment>? appointments,
     int? checkupDuration,
   }) {
     return Doctor(
       doctorID: doctorID ?? this.doctorID,
       person: person ?? this.person,
       specializations: specializations ?? this.specializations,
-      doctorQualification: doctorQualification ?? this.doctorQualification,
-      doctorExperience: doctorExperience ?? this.doctorExperience,
-      doctorAddress: doctorAddress ?? this.doctorAddress,
+      Qualification: Qualification ?? this.Qualification,
+      Experience: Experience ?? this.Experience,
       doctorFees: doctorFees ?? this.doctorFees,
       doctorTiming: doctorTiming ?? this.doctorTiming,
-      doctorHospital: doctorHospital ?? this.doctorHospital,
-      slots: slots ?? this.slots,
+      hospitalName: hospitalName ?? this.hospitalName,
+      hospitalId: hospitalId ?? this.hospitalId,
+      appointments: appointments ?? this.appointments,
       checkupDuration: checkupDuration ?? this.checkupDuration,
     );
   }
@@ -68,13 +70,13 @@ class Doctor {
       'doctorID': doctorID,
       'person': person?.toMap(),
       'specializations': specializations,
-      'doctorQualification': doctorQualification,
-      'doctorExperience': doctorExperience,
-      'doctorAddress': doctorAddress?.toMap(),
+      'Qualification': Qualification,
+      'Experience': Experience,
       'doctorFees': doctorFees,
       'doctorTiming': doctorTiming,
-      'doctorHospital': doctorHospital,
-      'slots': slots?.map((x) => x?.toMap())?.toList(),
+      'hospitalName': hospitalName,
+      'hospitalId': hospitalId,
+      'appointments': appointments?.map((x) => x?.toMap())?.toList(),
       'checkupDuration': checkupDuration,
     };
   }
@@ -84,16 +86,15 @@ class Doctor {
       doctorID: map['doctorID'],
       person: map['person'] != null ? Person.fromMap(map['person']) : null,
       specializations: List<String>.from(map['specializations']),
-      doctorQualification: map['doctorQualification'],
-      doctorExperience: map['doctorExperience'],
-      doctorAddress: map['doctorAddress'] != null
-          ? Address.fromMap(map['doctorAddress'])
-          : null,
+      Qualification: map['Qualification'],
+      Experience: map['Experience'],
       doctorFees: map['doctorFees']?.toDouble(),
       doctorTiming: map['doctorTiming']?.toInt(),
-      doctorHospital: map['doctorHospital'],
-      slots: map['slots'] != null
-          ? List<Slot>.from(map['slots']?.map((x) => Slot.fromMap(x)))
+      hospitalName: map['hospitalName'],
+      hospitalId: map['hospitalId'],
+      appointments: map['appointments'] != null
+          ? List<Appointment>.from(
+              map['appointments']?.map((x) => Appointment.fromMap(x)))
           : null,
       checkupDuration: map['checkupDuration']?.toInt(),
     );
@@ -105,7 +106,7 @@ class Doctor {
 
   @override
   String toString() {
-    return 'Doctor(doctorID: $doctorID, person: $person, specializations: $specializations, doctorQualification: $doctorQualification, doctorExperience: $doctorExperience, doctorAddress: $doctorAddress, doctorFees: $doctorFees, doctorTiming: $doctorTiming, doctorHospital: $doctorHospital, slots: $slots, checkupDuration: $checkupDuration)';
+    return 'Doctor(doctorID: $doctorID, person: $person, specializations: $specializations, Qualification: $Qualification, Experience: $Experience, doctorFees: $doctorFees, doctorTiming: $doctorTiming, hospitalName: $hospitalName, hospitalId: $hospitalId, appointments: $appointments, checkupDuration: $checkupDuration)';
   }
 
   @override
@@ -116,13 +117,13 @@ class Doctor {
         other.doctorID == doctorID &&
         other.person == person &&
         listEquals(other.specializations, specializations) &&
-        other.doctorQualification == doctorQualification &&
-        other.doctorExperience == doctorExperience &&
-        other.doctorAddress == doctorAddress &&
+        other.Qualification == Qualification &&
+        other.Experience == Experience &&
         other.doctorFees == doctorFees &&
         other.doctorTiming == doctorTiming &&
-        other.doctorHospital == doctorHospital &&
-        listEquals(other.slots, slots) &&
+        other.hospitalName == hospitalName &&
+        other.hospitalId == hospitalId &&
+        listEquals(other.appointments, appointments) &&
         other.checkupDuration == checkupDuration;
   }
 
@@ -131,13 +132,13 @@ class Doctor {
     return doctorID.hashCode ^
         person.hashCode ^
         specializations.hashCode ^
-        doctorQualification.hashCode ^
-        doctorExperience.hashCode ^
-        doctorAddress.hashCode ^
+        Qualification.hashCode ^
+        Experience.hashCode ^
         doctorFees.hashCode ^
         doctorTiming.hashCode ^
-        doctorHospital.hashCode ^
-        slots.hashCode ^
+        hospitalName.hashCode ^
+        hospitalId.hashCode ^
+        appointments.hashCode ^
         checkupDuration.hashCode;
   }
 }

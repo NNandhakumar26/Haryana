@@ -1,3 +1,4 @@
+import 'package:doctor_booking_application/Components/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,6 +29,13 @@ class Style {
   static const Color darkerText = Color(0xFF313A44);
 
   static const Color textFieldBackground = Color(0xffEFF3FE);
+
+  static textFieldStyle(context) =>
+      Theme.of(context).textTheme.headline6!.copyWith(
+            fontSize: 16,
+            color: Style.darkerText,
+            fontWeight: FontWeight.w600,
+          );
 
   static const List<Color> randomColorList = [
     Color(0xffAB8FF4),
@@ -78,7 +86,7 @@ class Style {
       );
 
   static InputDecoration get searchFieldStyle => InputDecoration(
-        hintText: 'Search By Category',
+        hintText: 'Book An Appointment',
         prefixIcon: Icon(
           Icons.search,
           color: Colors.black12,
@@ -141,10 +149,44 @@ class Style {
 
   static const Color primaryColor = Color(0xff1db7af);
 
-  static AnimatedNavigation(BuildContext context, Widget widget) {
-    return Navigator.push(
+  static Future<T?> navigate<T>(BuildContext context, Widget widget) {
+    return Navigator.pushAndRemoveUntil<T>(
       context,
-      PageRouteBuilder(
+      PageRouteBuilder<T>(
+        opaque: false,
+        pageBuilder: (BuildContext context, _, __) {
+          return widget;
+        },
+        transitionsBuilder:
+            (___, Animation<double> animation, ____, Widget child) {
+          return SlideTransition(
+            position: Tween(
+                    begin: const Offset(1.0, 0.0), end: const Offset(0.0, 0.0))
+                .animate(animation),
+            child: child,
+          );
+        },
+      ),
+      (route) => false,
+    );
+  }
+
+  static Future loadingDialog(BuildContext context,
+      {Widget? widget, String? title}) {
+    return showDialog(
+      context: context,
+      builder: (context) => (widget != null)
+          ? widget
+          : CustomLoadingDialog(
+              title: title ?? '',
+            ),
+    );
+  }
+
+  static Future<T?> navigateBack<T>(BuildContext context, Widget widget) {
+    return Navigator.push<T>(
+      context,
+      PageRouteBuilder<T>(
         opaque: false,
         pageBuilder: (BuildContext context, _, __) {
           return widget;
@@ -189,7 +231,6 @@ class Style {
   static ThemeData themeData(context) => ThemeData(
         primaryColor: Style.primaryColor,
         textTheme: Style.textTheme,
-
         timePickerTheme: TimePickerThemeData(
           backgroundColor: Colors.white,
           dialTextColor: Colors.black54,
@@ -203,6 +244,9 @@ class Style {
           overlayColor:
               MaterialStateProperty.all(Theme.of(context).primaryColor),
           fillColor: MaterialStateProperty.all(Style.primaryColor),
+        ),
+        iconTheme: IconThemeData(
+          size: 18,
         ),
         inputDecorationTheme: InputDecorationTheme(
           labelStyle: Theme.of(context).textTheme.bodyText1!.copyWith(
@@ -233,7 +277,12 @@ class Style {
           ),
           filled: true,
           fillColor: Colors.white,
+          iconColor: Colors.black38,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: Theme.of(context).primaryColor,
         ),
 
         colorScheme: ColorScheme(

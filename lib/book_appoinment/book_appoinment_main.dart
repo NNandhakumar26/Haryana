@@ -1,10 +1,11 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:badges/badges.dart';
+import 'package:doctor_booking_application/Widgets/future_builder.dart';
+import 'package:doctor_booking_application/Widgets/search_widget.dart';
 import 'package:doctor_booking_application/book_appoinment/available_doctor.dart';
-import 'package:doctor_booking_application/book_appoinment/book_slot.dart';
+import 'package:doctor_booking_application/database/cloud_database.dart';
+import 'package:doctor_booking_application/modals/model_export.dart';
 import 'package:flutter/material.dart';
-import '../Components/company_appbar.dart';
-import '../Components/textfield_without_controller.dart';
 import '../style.dart';
 
 class BookAppoinmentPage extends StatefulWidget {
@@ -13,161 +14,135 @@ class BookAppoinmentPage extends StatefulWidget {
 }
 
 class _BookAppoinmentPageState extends State<BookAppoinmentPage> {
-  String searchText = '';
+  final searchController = TextEditingController();
 
-  final listOfServices = <String>[
-    'Gerontology (BCG)',
-    'Mental Health (BCMH)',
-    'Pediatrics (BCP)',
-    'Physical Rehabilitation (BCPR)',
-    'Driving and Community Mobility (SCDCM or SCDCM-A)',
-    'Environmental Modification (SCEM or SCEM-A)',
-    'Feeding, Eating, and Swallowing (SCFES or SCFES-A)',
-    'Low Vision (SCLV or SCLV-A)',
-    'School Systems (SCSS or SCSS-A),',
-  ];
+  List<String> listOfServices = <String>[];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        child: CompanyAppbar(title: 'Choose Specialization'),
-        preferredSize: Size(double.infinity, 60),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(4),
-            child: FullTextField(
-              title: 'Enter Service Name',
-              icon: Icons.search,
-              onChanged: (value) {
-                setState(
-                  () {
-                    searchText = value;
-                  },
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: listOfServices
-                    .where((service) => service
-                        .toLowerCase()
-                        .contains(searchText.toLowerCase()))
-                    .map(
-                      (element) => Column(
-                        children: [
-                          ListTile(
-                            title: Text(
-                              element,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle2!
-                                  .copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Style.darkText.withOpacity(0.87),
-                                  ),
-                            ),
-                            onTap: () {
-                              searchText = '';
-                              FocusManager.instance.primaryFocus!.unfocus();
-                              Style.AnimatedNavigation(
-                                context,
-                                AvailableDoctorPage(),
-                              );
-                            },
+    return Material(
+      child: CustomFutureBuilder<List<String>>(
+        futureFunction: Network.getAllSpecializations(),
+        loadingText: 'Downloading Data',
+        onSuccessWidget: (networkList) {
+          listOfServices = networkList;
+
+          List<String> displayList = listOfServices
+              .where(
+                (element) => element.toLowerCase().contains(
+                      searchController.text.toLowerCase(),
+                    ),
+              )
+              .toList();
+          return SearchDisplayWidget(
+            title: 'Search Specialization',
+            setState: () {
+              setState(() {});
+            },
+            searchController: searchController,
+            displayList: displayList
+                .map(
+                  (e) => ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    title: Text(
+                      e,
+                      style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Style.darkText.withOpacity(0.87),
                           ),
-                          Divider(
-                            thickness: 0.24,
-                            indent: 16,
-                            endIndent: 16,
-                            color: Colors.grey.shade400,
-                          ),
-                        ],
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          )
-        ],
+                    ),
+                    onTap: () {
+                      FocusManager.instance.primaryFocus!.unfocus();
+                      Style.navigateBack(
+                        context,
+                        AvailableDoctorPage(
+                          specialization: e,
+                        ),
+                      );
+                    },
+                  ),
+                )
+                .toList(),
+          );
+        },
       ),
     );
-  }
-}
 
-class ImageWithChipWidget extends StatelessWidget {
-  const ImageWithChipWidget({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        radius: 32,
-        foregroundImage: AssetImage('assets/images/doctor.jpg'),
-      ),
-      minLeadingWidth: 0,
-      title: Align(
-        alignment: Alignment.centerLeft,
-        child: CustomChip(
-          text: 'Child Specialist',
-        ),
-      ),
-    );
-  }
-}
-
-class CustomChip extends StatelessWidget {
-  final String text;
-  const CustomChip({
-    Key? key,
-    required this.text,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      backgroundColor: Style.primary.shade50.withOpacity(0.48),
-      shape: RoundedRectangleBorder(
-        side: BorderSide(
-          color: Colors.transparent,
-          width: 0.0,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      elevation: 0,
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      label: Badge(
-        elevation: 0,
-        borderSide: BorderSide.none,
-        badgeColor: Colors.green.shade400,
-        alignment: Alignment.centerRight,
-        position: BadgePosition.bottomStart(
-          bottom: 5.8,
-        ),
-        shape: BadgeShape.circle,
-        padding: EdgeInsets.all(3.2),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 4.0),
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                  color: Style.darkerText.withOpacity(0.72),
-                ),
-          ),
-        ),
-      ),
-    );
+    // return Scaffold(
+    //   appBar: PreferredSize(
+    //     child: CompanyAppbar(title: 'Choose Specialization'),
+    //     preferredSize: Size(double.infinity, 60),
+    //   ),
+    //   body: Column(
+    //     children: [
+    //       Padding(
+    //         padding: EdgeInsets.all(4),
+    //         child: FullTextField(
+    //           title: 'Search The Specialization',
+    //           icon: Icons.search,
+    //           onChanged: (value) {
+    //             setState(
+    //               () {
+    //                 searchText = value;
+    //               },
+    //             );
+    //           },
+    //         ),
+    //       ),
+    //       Expanded(
+    //         child: SingleChildScrollView(
+    //           child: Column(
+    //             children: listOfServices
+    //                 .where((service) => service
+    //                     .toLowerCase()
+    //                     .contains(searchText.toLowerCase()))
+    //                 .map(
+    //                   (element) => Column(
+    //                     children: [
+    //                       ListTile(
+    //                         title: Text(
+    //                           element,
+    //                           style: Theme.of(context)
+    //                               .textTheme
+    //                               .subtitle2!
+    //                               .copyWith(
+    //                                 fontWeight: FontWeight.w600,
+    //                                 color: Style.darkText.withOpacity(0.87),
+    //                               ),
+    //                         ),
+    //                         onTap: () {
+    //                           searchText = '';
+    //                           FocusManager.instance.primaryFocus!.unfocus();
+    //                           Style.navigateBack(
+    //                             context,
+    //                             AvailableDoctorPage(),
+    //                           );
+    //                         },
+    //                       ),
+    //                       Divider(
+    //                         thickness: 0.24,
+    //                         indent: 16,
+    //                         endIndent: 16,
+    //                         color: Colors.grey.shade400,
+    //                       ),
+    //                     ],
+    //                   ),
+    //                 )
+    //                 .toList(),
+    //           ),
+    //         ),
+    //       )
+    //     ],
+    //   ),
+    // );
   }
 }
 
 class DoctorPage extends StatelessWidget {
-  const DoctorPage({Key? key}) : super(key: key);
+  final Doctor doctor;
+  DoctorPage(this.doctor, {Key? key}) : super(key: key);
 
   String dateValue(String value) {
     switch (value) {
@@ -234,10 +209,48 @@ class DoctorPage extends StatelessWidget {
                   backgroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 ),
-                onPressed: () => Style.AnimatedNavigation(
-                  context,
-                  BookSlotPage(),
-                ),
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    builder: (builder) {
+                      return Dialog(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children:
+                                ['Today', 'Tomorrow', 'Day after Tomorrow']
+                                    .map(
+                                      (e) => ListTile(
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                          Style.loadingDialog(context);
+                                          await Network.createAppointment(
+                                            Appointment(
+                                              doctorID: doctor.doctorID,
+                                              actualDateTime: DateTime.now(),
+                                              status: AppointmentStatus.Created,
+                                            ),
+                                            DateTime.parse(
+                                              dateValue(e),
+                                            ),
+                                          ).then(
+                                            (value) => Navigator.pop(context),
+                                          );
+                                        },
+                                        title: Text(e),
+                                        subtitle: Text(
+                                          dateValue(e),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
                 child: Text(
                   'Book Slot',
                   style: Theme.of(context).textTheme.button!.copyWith(
@@ -324,16 +337,17 @@ class DoctorPage extends StatelessWidget {
                     ),
                     8.width,
                     CustomChip(
-                      text: 'Child Specialist',
+                      text: 'Highly Rated',
                     ),
                   ],
                 ),
                 InfoContainer(
-                  title: 'Dr. Murari Singh',
+                  title: doctor.person?.name ?? '',
                   rating: '4.5',
                   isMain: true,
-                  subtitle1: 'No:52, Sannathy Street',
-                  subtitle2: 'Thirupathiripuliyur, Cuddalore.',
+                  subtitle1: doctor.person?.address?.streetName ?? '',
+                  subtitle2:
+                      ' ${doctor.person?.address?.city} , ${doctor.person?.address?.state}',
                 ),
                 8.height,
                 DefaultTabController(
@@ -370,23 +384,140 @@ class DoctorPage extends StatelessWidget {
                         height: MediaQuery.of(context).size.height - 80,
                         child: TabBarView(
                           children: [
-                            Column(
-                              children: [
-                                for (var i = 0; i < 5; i++)
-                                  WaitingPatientContainer(i: i),
-                              ],
+                            StreamBuilder<List<Appointment>>(
+                              stream: Network.doctorInstance
+                                  .doc(doctor.doctorID)
+                                  .collection('Appointments')
+                                  .doc(dateToString(DateTime.now()))
+                                  .snapshots()
+                                  .map(
+                                (event) {
+                                  return (event.data()!['appointments']
+                                          as List<dynamic>)
+                                      .map(
+                                    (e) {
+                                      print(
+                                          'Entered into appointment with a value of $e');
+                                      return Appointment.fromMap(e);
+                                    },
+                                  ).toList();
+                                },
+                              ),
+                              builder: (context, snapshot) {
+                                print(
+                                    'The snapshot data is ${snapshot.data.runtimeType} and the connection state is ${snapshot.connectionState}');
+                                if ((snapshot.connectionState ==
+                                        ConnectionState.waiting) ||
+                                    (snapshot.connectionState ==
+                                        ConnectionState.active)) {
+                                  if (snapshot.hasData) {
+                                    List displayList =
+                                        snapshot.data!.reversed.toList();
+
+                                    return SingleChildScrollView(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      child: Column(
+                                        children: displayList
+                                            .map(
+                                              (e) => WaitingPatientContainer(
+                                                i: (snapshot.data!.indexOf(e) +
+                                                    1),
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                    );
+                                  } else
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
                             ),
-                            Column(
-                              children: [
-                                for (var i = 0; i < 5; i++)
-                                  WaitingPatientContainer(i: i),
-                              ],
+                            StreamBuilder<List<Appointment>>(
+                              stream: Network.doctorInstance
+                                  .doc(doctor.doctorID)
+                                  .collection('Appointments')
+                                  .doc(dateToString(
+                                      DateTime.now().add(Duration(days: 1))))
+                                  .snapshots()
+                                  .map(
+                                    (event) => (event.data()!['appointments']
+                                            as List<dynamic>)
+                                        .map((e) => Appointment.fromMap(e))
+                                        .toList(),
+                                  ),
+                              builder: (context, snapshot) {
+                                print(
+                                    'The snapshot data is ${snapshot.data.runtimeType} and the connection state is ${snapshot.connectionState}');
+                                if ((snapshot.connectionState ==
+                                        ConnectionState.waiting) ||
+                                    (snapshot.connectionState ==
+                                        ConnectionState.active)) {
+                                  if (snapshot.hasData) {
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: snapshot.data!.length,
+                                      itemBuilder: (context, index) {
+                                        return WaitingPatientContainer(
+                                          i: index,
+                                        );
+                                      },
+                                    );
+                                  } else
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
                             ),
-                            Column(
-                              children: [
-                                for (var i = 0; i < 5; i++)
-                                  WaitingPatientContainer(i: i),
-                              ],
+                            StreamBuilder<List<Appointment>>(
+                              stream: Network.doctorInstance
+                                  .doc(doctor.doctorID)
+                                  .collection('Appointments')
+                                  .doc(dateToString(
+                                      DateTime.now().add(Duration(days: 2))))
+                                  .snapshots()
+                                  .map(
+                                    (event) => (event.data()!['appointments']
+                                            as List<dynamic>)
+                                        .map((e) => Appointment.fromMap(e))
+                                        .toList(),
+                                  ),
+                              builder: (context, snapshot) {
+                                print(
+                                    'The snapshot data is ${snapshot.data.runtimeType} and the connection state is ${snapshot.connectionState}');
+                                if ((snapshot.connectionState ==
+                                        ConnectionState.waiting) ||
+                                    (snapshot.connectionState ==
+                                        ConnectionState.active)) {
+                                  if (snapshot.hasData) {
+                                    return ListView.builder(
+                                      itemCount: snapshot.data!.length,
+                                      itemBuilder: (context, index) {
+                                        return WaitingPatientContainer(
+                                          i: index,
+                                        );
+                                      },
+                                    );
+                                  } else
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -401,6 +532,44 @@ class DoctorPage extends StatelessWidget {
       ),
     );
   }
+
+  // Widget getWaitingList(DateTime date) {
+  //   // stream builder to get the stream of current apponintments
+  //   return StreamBuilder<List<Appointment>>(
+  //     stream: Network.getDoctorAppointments(doctor.doctorID!, date)
+  //         .asBroadcastStream(),
+  //     builder: (context, snapshot) {
+  //       print('The snapshot data is ${snapshot.data.runtimeType}');
+  //       if (snapshot.connectionState == ConnectionState.active) {
+  //         return ListView.builder(
+  //           itemCount: snapshot.data!.length,
+  //           itemBuilder: (context, index) {
+  //             return WaitingPatientContainer(
+  //               i: index,
+  //             );
+  //           },
+  //         );
+  //       } else {
+  //         return Center(
+  //           child: CircularProgressIndicator(),
+  //         );
+  //       }
+  //     },
+  //   );
+
+  //   // return CustomFutureBuilder<List<Appointment>>(
+  //   //   onSuccessWidget: (appointmentList) {
+  //   //     return ListView.builder(
+  //   //       itemBuilder: (itemBuilder, index) {
+  //   //         return WaitingPatientContainer(i: index);
+  //   //       },
+  //   //       itemCount: appointmentList.length,
+  //   //     );
+  //   //   },
+  //   //   futureFunction: Network.getDoctorAppointments(doctor.doctorID!, date),
+  //   // );
+  // }
+
 }
 
 class WaitingPatientContainer extends StatelessWidget {
@@ -460,6 +629,77 @@ class WaitingPatientContainer extends StatelessWidget {
                   ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ImageWithChipWidget extends StatelessWidget {
+  final String imageUrl;
+  final String chipText;
+  const ImageWithChipWidget({
+    Key? key,
+    this.imageUrl = 'assets/images/doctor.jpg',
+    required this.chipText,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 32,
+        foregroundImage: AssetImage(imageUrl),
+      ),
+      minLeadingWidth: 0,
+      title: Align(
+        alignment: Alignment.centerLeft,
+        child: CustomChip(
+          text: chipText,
+        ),
+      ),
+    );
+  }
+}
+
+class CustomChip extends StatelessWidget {
+  final String text;
+  const CustomChip({
+    Key? key,
+    required this.text,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      backgroundColor: Style.primary.shade50.withOpacity(0.48),
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: Colors.transparent,
+          width: 0.0,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      elevation: 0,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      label: Badge(
+        elevation: 0,
+        borderSide: BorderSide.none,
+        badgeColor: Colors.green.shade400,
+        alignment: Alignment.centerRight,
+        position: BadgePosition.bottomStart(
+          bottom: 5.8,
+        ),
+        shape: BadgeShape.circle,
+        padding: EdgeInsets.all(3.2),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                  color: Style.darkerText.withOpacity(0.72),
+                ),
+          ),
         ),
       ),
     );

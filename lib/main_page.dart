@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor_booking_application/Components/company_appbar.dart';
 import 'package:doctor_booking_application/Registration/doctor_registration.dart';
+import 'package:doctor_booking_application/Registration/patient_registration.dart';
 import 'package:doctor_booking_application/Template/tabs/HomeTab.dart';
 import 'package:doctor_booking_application/Widgets/titleView.dart';
-import 'package:doctor_booking_application/book_appoinment/available_doctor.dart';
 import 'package:doctor_booking_application/book_appoinment/book_appoinment_main.dart';
 import 'package:doctor_booking_application/constants.dart';
+import 'package:doctor_booking_application/doctor/doctor_appointment_page.dart';
 import 'package:doctor_booking_application/first_page/first_page.dart';
 import 'package:doctor_booking_application/modals/doctors.dart';
+import 'package:doctor_booking_application/modals/model_export.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
 import 'Template/tabs/ScheduleTab.dart';
@@ -43,7 +46,7 @@ class _MainPageState extends State<MainPage> {
               title: 'Doctor',
             ),
             ...[
-              ['My Schedule', Icons.calendar_today, SecondPageMain()],
+              ['My Schedule', Icons.calendar_today, DoctorAppointmentPage()],
               [
                 'Profile',
                 Icons.person,
@@ -81,7 +84,14 @@ class _MainPageState extends State<MainPage> {
               title: 'Patient',
             ),
             ...[
-              ['Profile', Icons.person, MainPage()],
+              [
+                'Profile',
+                Icons.person,
+                PatientRegistrationPage(
+                  patient: Patient(),
+                  isNewPatient: true,
+                ),
+              ],
               ['Notifications', Icons.person, MainPage()],
               ['Settings', Icons.settings, MainPage()],
               ['Logout', Icons.exit_to_app, MainPage()],
@@ -97,7 +107,14 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
-      body: (doctorLogin) ? SecondPageMain() : FirstPageWidget(),
+      // body: (doctorLogin) ? DoctorAppointmentPage() : FirstPageWidget(),
+      body: (doctorLogin)
+          ? FirstPageWidget(
+              isPatient: false,
+            )
+          : FirstPageWidget(
+              isPatient: true,
+            ),
       // : switchWidget(currentPage, mainPageScaffoldKey),
       // bottomNavigationBar: (doctorLogin)
       //     ? null
@@ -124,7 +141,7 @@ class _MainPageState extends State<MainPage> {
       case 0:
         return FirstPageWidget();
       case 1:
-        return SecondPageMain();
+        return DoctorAppointmentPage();
       case 2:
         return FirstPage();
       // case 3:
@@ -195,6 +212,16 @@ class CustomDrawerWidget extends StatelessWidget {
 class FirstPageWidget extends StatelessWidget {
   final bool isPatient;
   FirstPageWidget({Key? key, this.isPatient = true}) : super(key: key);
+
+  String get greetings {
+    if (TimeOfDay.now().hour < 12)
+      return 'Good Morning';
+    else if (TimeOfDay.now().hour < 18)
+      return 'Good Afternoon';
+    else
+      return 'Good Evening';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -242,7 +269,7 @@ class FirstPageWidget extends StatelessWidget {
                 horizontal: 0,
               ),
               child: Text(
-                'Good Morning.',
+                greetings,
                 style: Theme.of(context).textTheme.subtitle2!.copyWith(
                       // fontWeight: FontWeight.bold,
                       color: Style.primary.shade50,
@@ -295,7 +322,88 @@ class DoctorFirstPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Column(
+      children: [
+        TitleView(
+          title: 'Your Appointments',
+        ),
+        ...['Today', 'Tomorrow', 'Day After'].map(
+          (e) => ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 12),
+            title: Text(
+              e,
+              style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            trailing: Icon(
+              Icons.keyboard_arrow_right,
+              color: Style.primary.shade100,
+              size: 18,
+            ),
+            onTap: () {
+              Style.navigateBack(
+                context,
+                DoctorAppointmentPage(),
+              );
+            },
+          ),
+        ),
+        8.height,
+        TitleView(
+          title: 'Quick Actions',
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8,
+          ),
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                LargeIconButton(
+                  icon: Icons.send_rounded,
+                  title: 'Send Package',
+                  onPressed: () {
+                    Style.navigateBack(
+                      context,
+                      DoctorAppointmentPage(),
+                    );
+                  },
+                ),
+                LargeIconButton(
+                  icon: Icons.track_changes_rounded,
+                  title: 'Track Order',
+                  onPressed: () {
+                    // Get.to(() => ProductManagementPage());
+                  },
+                ),
+                LargeIconButton(
+                  icon: Icons.check_rounded,
+                  title: 'Check Price',
+                  onPressed: () {
+                    // Get.to(() => ProductManagementPage());
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        TitleView(
+          title: 'Appointment Today',
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        // AppointmentCard(
+        //   onTap: () {
+        //     print('Working');
+        //   },
+        // ),
+      ],
+    );
   }
 }
 
@@ -357,7 +465,6 @@ class PatientFirstPageWidget extends StatelessWidget {
                 ),
           ),
         ),
-
         Container(
           margin: EdgeInsets.symmetric(
             vertical: 16,
@@ -378,9 +485,11 @@ class PatientFirstPageWidget extends StatelessWidget {
               fit: BoxFit.contain,
               child: InkWell(
                 onTap: () {
-                  Style.AnimatedNavigation(
+                  Style.navigateBack(
                     context,
-                    DoctorPage(),
+                    DoctorPage(
+                      Doctor(),
+                    ),
                   );
                 },
                 child: Column(
@@ -427,19 +536,6 @@ class PatientFirstPageWidget extends StatelessWidget {
             itemCount: 10,
           ),
         ),
-        //TODO: Show this only if appointment is available
-        TitleView(
-          title: 'Appointment Today',
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        AppointmentCard(
-          onTap: () {
-            print('Working');
-          },
-        ),
-
         TitleView(
           title: 'Nearby Hospitals',
         ),
@@ -461,71 +557,155 @@ class PatientFirstPageWidget extends StatelessWidget {
           title: 'Nearby Doctors',
         ),
 
-        for (var i = 0; i < 2; i++) DoctorIntroWidget(),
+        // for (var i = 0; i < 2; i++) DoctorIntroWidget(),
         320.height,
       ],
-      // children: [
-      //   Container(
-      //     padding: const EdgeInsets.symmetric(
-      //       vertical: 8,
-      //     ),
-      //     child: Row(
-      //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //       children: [
-      //         LargeIconButton(
-      //           icon: Icons.send_rounded,
-      //           title: 'Send Package',
-      //           onPressed: () {
-      //             // Navigator.push(
-      //             //   context,
-      //             //   MaterialPageRoute(
-      //             //     builder: (context) => ProfilePage(),
-      //             //   ),
-      //             // );
-      //           },
-      //         ),
-      //         LargeIconButton(
-      //           icon: Icons.track_changes_rounded,
-      //           title: 'Track Order',
-      //           onPressed: () {
-      //             // Get.to(() => ProductManagementPage());
-      //           },
-      //         ),
-      //         LargeIconButton(
-      //           icon: Icons.check_rounded,
-      //           title: 'Check Price',
-      //           onPressed: () {
-      //             // Get.to(() => ProductManagementPage());
-      //           },
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      //   TitleView(
-      //     title: 'Promo Today',
-      //   ),
-      //   Container(
-      //     height: MediaQuery.of(context).size.height / 4.82,
-      //     margin: EdgeInsets.symmetric(
-      //       horizontal: 8,
-      //       vertical: 16,
-      //     ),
-      //     decoration: BoxDecoration(
-      //       image: DecorationImage(
-      //         image: AssetImage('assets/images/banner.png'),
-      //         fit: BoxFit.cover,
-      //       ),
-      //       borderRadius: BorderRadius.circular(16),
-      //     ),
-      //     alignment: Alignment.center,
-      //     // child: Image(
-      //     //   image: AssetImage('assets/images/banner.png'),
-      //     // ),
-      //   ),
-      //   TitleView(
-      //     title: 'Today\'s Deliveries',
-      //   ),
-      // ],
+    );
+  }
+}
+
+class AppointmentCard extends StatelessWidget {
+  final void Function() onTap;
+
+  const AppointmentCard({
+    Key? key,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/images/doctor.jpg'),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dr.Muhammed Syahid',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                            ),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Text(
+                              'Dental Specialist',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle2!
+                                  .copyWith(
+                                    color: Colors.white70,
+                                  ),
+                            ),
+                            // ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    DateTimeCard(
+                      haveWhiteBackground: true,
+                    ),
+                    // ScheduleCard(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          width: double.infinity,
+          height: 10,
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withOpacity(0.48),
+            borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+            ),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 40),
+          width: double.infinity,
+          height: 10,
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withOpacity(0.16),
+            borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class DateTimeCard extends StatelessWidget {
+  final bool haveWhiteBackground;
+  const DateTimeCard({
+    Key? key,
+    this.haveWhiteBackground = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: (haveWhiteBackground)
+            ? Style.primary.shade400
+            : Theme.of(context).primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      width: double.infinity,
+      padding: EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          RowIconWithText(
+            icon: Icons.calendar_today,
+            value: 'Mon, July 29',
+            isWhiteText: haveWhiteBackground,
+          ),
+          RowIconWithText(
+            icon: Icons.access_alarm,
+            value: '11:00 ~ 12:10',
+            isWhiteText: haveWhiteBackground,
+          ),
+        ],
+      ),
     );
   }
 }

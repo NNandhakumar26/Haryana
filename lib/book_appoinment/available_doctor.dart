@@ -1,12 +1,20 @@
 import 'package:doctor_booking_application/Components/company_appbar.dart';
 import 'package:doctor_booking_application/Template/tabs/ScheduleTab.dart';
+import 'package:doctor_booking_application/Widgets/future_builder.dart';
 import 'package:doctor_booking_application/book_appoinment/book_appoinment_main.dart';
+import 'package:doctor_booking_application/database/cloud_database.dart';
+import 'package:doctor_booking_application/doctor/doctor_appointment_page.dart';
+import 'package:doctor_booking_application/modals/doctors.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounce/flutter_bounce.dart';
 
 class AvailableDoctorPage extends StatelessWidget {
-  const AvailableDoctorPage({Key? key}) : super(key: key);
+  final String specialization;
+  const AvailableDoctorPage({
+    Key? key,
+    required this.specialization,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +29,33 @@ class AvailableDoctorPage extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView.builder(
-                physics: BouncingScrollPhysics(),
-                itemCount: 10,
-                itemBuilder: (itemBuilder, index) => DoctorIntroWidget(),
-              ),
+            child: CustomFutureBuilder<List<Doctor>>(
+              onSuccessWidget: (doctorList) {
+                return (doctorList.isNotEmpty)
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          itemCount: doctorList.length,
+                          itemBuilder: (itemBuilder, index) =>
+                              DoctorIntroWidget(
+                            doctor: doctorList[index],
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'Oops.. No Doctores Available ! Please try again later.',
+                          style:
+                              Theme.of(context).textTheme.headline6!.copyWith(
+                                    color: Colors.black26,
+                                    fontSize: 16,
+                                  ),
+                        ),
+                      );
+              },
+              futureFunction:
+                  Network.getDoctorsWithSpecialization(specialization),
             ),
           ),
         ],
@@ -38,9 +66,12 @@ class AvailableDoctorPage extends StatelessWidget {
 
 class DoctorIntroWidget extends StatelessWidget {
   final bool disableOnTap;
+  final Doctor? doctor;
+
   const DoctorIntroWidget({
     Key? key,
     this.disableOnTap = false,
+    this.doctor,
   }) : super(key: key);
 
   @override
@@ -49,9 +80,11 @@ class DoctorIntroWidget extends StatelessWidget {
       duration: Duration(milliseconds: 148),
       onPressed: () {
         if (!disableOnTap) {
-          Style.AnimatedNavigation(
+          Style.navigateBack(
             context,
-            DoctorPage(),
+            DoctorPage(
+              doctor!,
+            ),
           );
         }
       },
@@ -71,14 +104,16 @@ class DoctorIntroWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               //TODO: Use hero here to the next screeen
-              ImageWithChipWidget(),
+              ImageWithChipWidget(
+                chipText: 'Avilable',
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Dr. Murari',
+                      doctor?.person?.name ?? '',
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.headline6!.copyWith(
                             color: Style.primary.shade600,

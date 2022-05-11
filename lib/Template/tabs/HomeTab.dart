@@ -1,5 +1,7 @@
 import 'package:doctor_booking_application/Template/styles/colors.dart';
 import 'package:doctor_booking_application/Template/tabs/ScheduleTab.dart';
+import 'package:doctor_booking_application/doctor/doctor_appointment_page.dart';
+import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
 
 import '../styles/styles.dart';
@@ -80,9 +82,9 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            AppointmentCard(
-              onTap: onPressedScheduleCard,
-            ),
+            // AppointmentCard(
+            //   onTap: onPressedScheduleCard,
+            // ),
             SizedBox(
               height: 20,
             ),
@@ -186,114 +188,6 @@ class TopDoctorCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class AppointmentCard extends StatelessWidget {
-  final void Function() onTap;
-
-  const AppointmentCard({
-    Key? key,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage:
-                              AssetImage('assets/images/doctor.jpg'),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dr.Muhammed Syahid',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                            ),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              'Dental Specialist',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle2!
-                                  .copyWith(
-                                    color: Colors.white70,
-                                  ),
-                            ),
-                            // ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    DateTimeCard(
-                      haveWhiteBackground: true,
-                    ),
-                    // ScheduleCard(),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 20),
-          width: double.infinity,
-          height: 10,
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.48),
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 40),
-          width: double.infinity,
-          height: 10,
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.16),
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

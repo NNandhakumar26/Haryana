@@ -1,3 +1,5 @@
+import 'package:doctor_booking_application/Components/loading.dart';
+import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
 import 'package:async/async.dart';
 
@@ -7,12 +9,14 @@ class CustomFutureBuilder<T> extends StatefulWidget {
   final Widget? onFailure;
   final Widget? onEmpty;
   final Future<T> futureFunction;
+  final String loadingText;
 
   CustomFutureBuilder({
     required this.onSuccessWidget,
     this.runOnce = true,
     this.onFailure,
     this.onEmpty,
+    this.loadingText = 'Loading',
     required this.futureFunction,
   });
 
@@ -36,7 +40,9 @@ class _CustomFutureBuilderState<T> extends State<CustomFutureBuilder<T>> {
         AsyncSnapshot<T> snapshot,
       ) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return CustomLoadingDialog(
+            title: widget.loadingText,
+          );
         } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             return const Text('Error');

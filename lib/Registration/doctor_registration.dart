@@ -1,8 +1,11 @@
+import 'package:doctor_booking_application/Components/RowTextField.dart';
 import 'package:doctor_booking_application/Components/company_appbar.dart';
 import 'package:doctor_booking_application/Components/divider.dart';
 import 'package:doctor_booking_application/Widgets/boucing_button.dart';
 import 'package:doctor_booking_application/Widgets/future_builder.dart';
+import 'package:doctor_booking_application/Widgets/search_widget.dart';
 import 'package:doctor_booking_application/database/cloud_database.dart';
+import 'package:doctor_booking_application/modals/hospital.dart';
 import 'package:doctor_booking_application/modals/person.dart';
 import 'package:doctor_booking_application/modals/slot.dart';
 import 'package:flutter/material.dart';
@@ -10,19 +13,27 @@ import 'package:doctor_booking_application/Components/textfield_without_controll
 import 'package:doctor_booking_application/modals/doctors.dart';
 import '../style.dart';
 
-class DoctorRegistrationPage extends StatelessWidget {
+class DoctorRegistrationPage extends StatefulWidget {
   final Doctor doctor;
 
   DoctorRegistrationPage({Key? key, required this.doctor});
 
+  @override
+  State<DoctorRegistrationPage> createState() => _DoctorRegistrationPageState();
+}
+
+class _DoctorRegistrationPageState extends State<DoctorRegistrationPage> {
   final String? radioButtonValue = '';
+
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    if (doctor.person == null) doctor.person = Person();
-    if (doctor.person!.address == null) doctor.person!.address = Address();
-    if (doctor.specializations == null) doctor.specializations = [];
+    if (widget.doctor.person == null) widget.doctor.person = Person();
+    if (widget.doctor.person!.address == null)
+      widget.doctor.person!.address = Address();
+    if (widget.doctor.specializations == null)
+      widget.doctor.specializations = [];
 
     return Material(
       color: Colors.transparent,
@@ -38,13 +49,12 @@ class DoctorRegistrationPage extends StatelessWidget {
                 fieldWidget: FullTextField(
                   title: 'First Last Name',
                   onChanged: (String value) {
-                    doctor.person!.name = value;
+                    widget.doctor.person!.name = value;
                   },
                 ),
               ),
 
               // CustomDatePicker(selectedDate: doctor., function: function)
-
               // TitleInputFieldWidget(
               //   title: 'Date of Birth',
               //   fieldWidget: FullTextField(
@@ -59,7 +69,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: 'In yrs',
                   onChanged: (String value) {
                     if (int.tryParse(value) != null) {
-                      doctor.person!.age = int.parse(value);
+                      widget.doctor.person!.age = int.parse(value);
                     }
                   },
                 ),
@@ -71,7 +81,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                   inputType: TextInputType.number,
                   title: 'In years',
                   onChanged: (String value) {
-                    doctor.doctorExperience = value;
+                    widget.doctor.Experience = value;
                   },
                 ),
               ),
@@ -81,7 +91,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                 fieldWidget: FullTextField(
                   title: 'House No, Street, Area',
                   onChanged: (String value) {
-                    doctor.person!.address!.streetName = value;
+                    widget.doctor.person!.address!.streetName = value;
                   },
                 ),
               ),
@@ -91,7 +101,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                 fieldWidget: FullTextField(
                   title: 'City Name',
                   onChanged: (String value) {
-                    doctor.person!.address!.city = value;
+                    widget.doctor.person!.address!.city = value;
                   },
                 ),
               ),
@@ -101,7 +111,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                 fieldWidget: FullTextField(
                   title: 'State Name',
                   onChanged: (String value) {
-                    doctor.person!.address!.state = value;
+                    widget.doctor.person!.address!.state = value;
                   },
                 ),
               ),
@@ -113,7 +123,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: 'In number',
                   onChanged: (String value) {
                     if (int.tryParse(value) != null) {
-                      doctor.person!.address!.pincode = int.parse(value);
+                      widget.doctor.person!.address!.pincode = int.parse(value);
                     }
                   },
                 ),
@@ -124,7 +134,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                 fieldWidget: FullTextField(
                   title: 'Degree',
                   onChanged: (String value) {
-                    doctor.doctorQualification = value;
+                    widget.doctor.Qualification = value;
                   },
                 ),
               ),
@@ -135,7 +145,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                   inputType: TextInputType.emailAddress,
                   title: 'Email',
                   onChanged: (String value) {
-                    doctor.person!.email = value;
+                    widget.doctor.person!.email = value;
                   },
                 ),
               ),
@@ -147,25 +157,96 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: '9876543210',
                   onChanged: (String value) {
                     if (int.tryParse(value) != null) {
-                      doctor.person!.contact1 = int.parse(value);
+                      widget.doctor.person!.contact1 = int.parse(value);
                     }
                   },
                 ),
               ),
 
-              TitleInputFieldWidget(
-                title: 'Hospital',
-                fieldWidget: FullTextField(
-                  title: 'Hospital Name',
-                  onChanged: (String value) {
-                    doctor.doctorHospital = value;
-                  },
+              ListTile(
+                contentPadding: EdgeInsets.symmetric(horizontal: 6),
+                title: Text('Specializations'),
+                subtitle: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                  ),
+                  child: Text('Select Specializations'),
                 ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                ),
+                onTap: () {
+                  Style.navigateBack(
+                    context,
+                    SpecializationRegistrationPage(widget.doctor),
+                  );
+                },
               ),
 
-              FieldTitle(
-                text: 'Upload Picture',
-              ),
+              (widget.doctor.hospitalName == null)
+                  ? ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 6),
+                      title: Text('Select Hospital'),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                        ),
+                        child: Text('Select Hospital'),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 18,
+                      ),
+                      onTap: () async {
+                        await Style.navigateBack(context, SearchHospital())
+                            .then(
+                          (value) {
+                            if (value is Hospital) {
+                              widget.doctor.hospitalId = value.hospitalID;
+                              widget.doctor.hospitalName = value.hospitalName;
+                              setState(() {});
+                            }
+                          },
+                        );
+                      },
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FieldTitle(
+                            text: 'Clinic Name',
+                          ),
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: TextFormField(
+                            initialValue: widget.doctor.hospitalName,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    widget.doctor.hospitalId = null;
+                                    widget.doctor.hospitalName = null;
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.clear,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+              // FieldTitle(
+              //   text: 'Upload Picture',
+              // ),
 
               // UploadButtonWidget(),
               TitleInputFieldWidget(
@@ -175,7 +256,7 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: '(In Mins)',
                   onChanged: (String value) {
                     if (int.tryParse(value) != null)
-                      doctor.checkupDuration = int.parse(value);
+                      widget.doctor.checkupDuration = int.parse(value);
                   },
                 ),
               ),
@@ -192,244 +273,36 @@ class DoctorRegistrationPage extends StatelessWidget {
                   title: 'In Rupees',
                   onChanged: (String value) {
                     if (double.tryParse(value) != null) {
-                      doctor.doctorFees = double.parse(value);
+                      widget.doctor.doctorFees = double.parse(value);
                     }
                   },
                 ),
               ),
 
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: BouncingButton(
-                    voidCallback: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => SpecializationRegistrationPage(
-                            doctor,
-                          ),
-                        ),
-                      );
-                    },
-                    title: 'Proceed',
-                  ),
-                ),
-              )
+              // Align(
+              //   alignment: Alignment.center,
+              //   child: Padding(
+              //     padding: const EdgeInsets.all(8.0),
+              //     child: BouncingButton(
+              //       voidCallback: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (builder) => SpecializationRegistrationPage(
+              //               doctor,
+              //             ),
+              //           ),
+              //         );
+              //       },
+              //       title: 'Proceed',
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
       ),
     );
-    // return Scaffold(
-    //   appBar: PreferredSize(
-    //     child: CompanyAppbar(
-    //       title: "Doctor Registration",
-    //       hasBackButton: false,
-    //     ),
-    //     preferredSize: Size(double.infinity, 64),
-    //   ),
-    //   body: SafeArea(
-    //     child: GestureDetector(
-    //       onTap: () => FocusScope.of(context).unfocus(),
-    //       child: SingleChildScrollView(
-    //         child: Column(
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           mainAxisSize: MainAxisSize.max,
-    //           children: [
-    //             TitleInputFieldWidget(
-    //               title: 'Full Name',
-    //               fieldWidget: FullTextField(
-    //                 title: 'First Last Name',
-    //                 onChanged: (String value) {
-    //                   doctor.person!.name = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             // CustomDatePicker(selectedDate: doctor., function: function)
-
-    //             // TitleInputFieldWidget(
-    //             //   title: 'Date of Birth',
-    //             //   fieldWidget: FullTextField(
-    //             //     title: 'DD-MM-YY',
-    //             //   ),
-    //             // ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Age',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.number,
-    //                 title: 'In yrs',
-    //                 onChanged: (String value) {
-    //                   if (int.tryParse(value) != null) {
-    //                     doctor.person!.age = int.parse(value);
-    //                   }
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Experience',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.number,
-    //                 title: 'In years',
-    //                 onChanged: (String value) {
-    //                   doctor.doctorExperience = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Address',
-    //               fieldWidget: FullTextField(
-    //                 title: 'House No, Street, Area',
-    //                 onChanged: (String value) {
-    //                   doctor.person!.address!.streetName = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'City',
-    //               fieldWidget: FullTextField(
-    //                 title: 'City Name',
-    //                 onChanged: (String value) {
-    //                   doctor.person!.address!.city = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'State',
-    //               fieldWidget: FullTextField(
-    //                 title: 'State Name',
-    //                 onChanged: (String value) {
-    //                   doctor.person!.address!.state = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Pincode',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.number,
-    //                 title: 'In number',
-    //                 onChanged: (String value) {
-    //                   if (int.tryParse(value) != null) {
-    //                     doctor.person!.address!.pincode = int.parse(value);
-    //                   }
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Qualification',
-    //               fieldWidget: FullTextField(
-    //                 title: 'Degree',
-    //                 onChanged: (String value) {
-    //                   doctor.doctorQualification = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Email Address',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.emailAddress,
-    //                 title: 'Email',
-    //                 onChanged: (String value) {
-    //                   doctor.person!.email = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Phone Number',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.number,
-    //                 title: '9876543210',
-    //                 onChanged: (String value) {
-    //                   if (int.tryParse(value) != null) {
-    //                     doctor.person!.contact1 = int.parse(value);
-    //                   }
-    //                 },
-    //               ),
-    //             ),
-
-    //             TitleInputFieldWidget(
-    //               title: 'Hospital',
-    //               fieldWidget: FullTextField(
-    //                 title: 'Hospital Name',
-    //                 onChanged: (String value) {
-    //                   doctor.doctorHospital = value;
-    //                 },
-    //               ),
-    //             ),
-
-    //             FieldTitle(
-    //               text: 'Upload Picture',
-    //             ),
-
-    //             // UploadButtonWidget(),
-    //             TitleInputFieldWidget(
-    //               title: 'Average Duration per Session',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.number,
-    //                 title: '(In Mins)',
-    //                 onChanged: (String value) {
-    //                   if (int.tryParse(value) != null)
-    //                     doctor.checkupDuration = int.parse(value);
-    //                 },
-    //               ),
-    //             ),
-    //             // TitleInputFieldWidget(
-    //             //   title: 'Time Available',
-    //             //   fieldWidget: FullTextField(
-    //             //     title: '00:00AM - 00:00PM',
-    //             //   ),
-    //             // ),
-    //             TitleInputFieldWidget(
-    //               title: 'Average OPD Fees',
-    //               fieldWidget: FullTextField(
-    //                 inputType: TextInputType.number,
-    //                 title: 'In Rupees',
-    //                 onChanged: (String value) {
-    //                   if (double.tryParse(value) != null) {
-    //                     doctor.doctorFees = double.parse(value);
-    //                   }
-    //                 },
-    //               ),
-    //             ),
-    //             Align(
-    //               alignment: Alignment.center,
-    //               child: Padding(
-    //                 padding: const EdgeInsets.all(8.0),
-    //                 child: BouncingButton(
-    //                   voidCallback: () {
-    //                     print(doctor.toString());
-    //                     Navigator.push(
-    //                       context,
-    //                       MaterialPageRoute(
-    //                         builder: (builder) =>
-    //                             SpecializationRegistrationPage(
-    //                           doctor,
-    //                         ),
-    //                       ),
-    //                     );
-    //                   },
-    //                   title: 'Proceed',
-    //                 ),
-    //               ),
-    //             )
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-
-    //   ),
-    // );
   }
 }
 
@@ -445,6 +318,8 @@ class SpecializationRegistrationPage extends StatefulWidget {
 
 class _SpecializationRegistrationPageState
     extends State<SpecializationRegistrationPage> {
+  TextEditingController searchValue = TextEditingController();
+
   bool checkAvailability(String value) {
     try {
       return (widget.doctor.specializations!.firstWhere(
@@ -476,55 +351,180 @@ class _SpecializationRegistrationPageState
           ),
           Expanded(
             child: CustomFutureBuilder<List<String>>(
-              futureFunction: Network.getAllSpecializations(),
-              onSuccessWidget: (Specialization) => ListView.separated(
-                separatorBuilder: (context, index) => CustomDivider(),
-                itemCount: Specialization.length,
-                itemBuilder: (context, index) {
-                  return CheckboxListTile(
-                    title: Text(
-                      Specialization[index].toString(),
-                      style: Theme.of(context).textTheme.bodyText2,
-                    ),
-                    value: checkAvailability(Specialization[index]),
-                    onChanged: (bool? value) {
-                      if (value ?? true) {
-                        widget.doctor.specializations!
-                            .add(Specialization[index]);
-                      } else {
-                        widget.doctor.specializations!
-                            .remove(Specialization[index]);
-                      }
-                      setState(() {});
-                    },
+                futureFunction: Network.getAllSpecializations(),
+                onSuccessWidget: (specializationList) {
+                  // display the list of specializations with the search text
+                  // List<String> displayList = specializationList;
+                  List<String> displayList = specializationList
+                      .where(
+                        (element) => element.toLowerCase().contains(
+                              searchValue.text.toLowerCase(),
+                            ),
+                      )
+                      .toList();
+                  print('The display list is $displayList');
+                  return Column(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              controller: searchValue,
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  size: 20,
+                                ),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    searchValue.clear();
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    Icons.clear,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 9,
+                        child: ListView.separated(
+                          separatorBuilder: (context, index) => CustomDivider(),
+                          itemCount: displayList.length,
+                          itemBuilder: (context, index) {
+                            return CheckboxListTile(
+                              title: Text(
+                                displayList[index].toString(),
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                              value: checkAvailability(displayList[index]),
+                              onChanged: (bool? value) {
+                                if (value ?? true) {
+                                  widget.doctor.specializations!
+                                      .add(displayList[index]);
+                                } else {
+                                  widget.doctor.specializations!
+                                      .remove(displayList[index]);
+                                }
+                                setState(() {});
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   );
-                },
-              ),
-            ),
+                }),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: BouncingButton(
               voidCallback: () async {
                 //show a loading dialog
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => CircularProgressIndicator(),
-                );
-
-                // await Network.addDoctor(widget.doctor);
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (builder) => MainPage(),
-                //   ),
+                // showDialog(
+                //   context: context,
+                //   barrierDismissible: false,
+                //   builder: (context) => CircularProgressIndicator(),
                 // );
+
+                // // await Network.addDoctor(widget.doctor);
+                // // Navigator.push(
+                // //   context,
+                // //   MaterialPageRoute(
+                // //     builder: (builder) => MainPage(),
+                // //   ),
+                // // );
+                Navigator.pop(context);
               },
-              title: 'Proceed',
+              title: 'Finish',
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SearchHospital extends StatefulWidget {
+  const SearchHospital({Key? key}) : super(key: key);
+
+  @override
+  State<SearchHospital> createState() => _SearchHospitalState();
+}
+
+class _SearchHospitalState extends State<SearchHospital> {
+  List<Hospital> hospitalList = [];
+
+  TextEditingController searchController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: CustomFutureBuilder<List<Hospital>>(
+        futureFunction: Network.getAllHospitals(),
+        loadingText: 'Downloading Data',
+        onSuccessWidget: (networkList) {
+          hospitalList = networkList;
+          print(hospitalList.toString());
+          // displaylist
+          List<Hospital> displayList = hospitalList
+              .where(
+                (Hospital hospital) => hospital.hospitalName!
+                    .toLowerCase()
+                    .contains(searchController.text),
+              )
+              .toList();
+
+          return SearchDisplayWidget(
+            title: 'Search Your Clinic',
+            setState: () {
+              setState(() {});
+            },
+            // child: DropdownButton<SearchWith>(
+            //   value: searchWith,
+            //   focusColor: Colors.transparent,
+            //   style: TextStyle(color: Colors.white),
+            //   underline: SizedBox(),
+            //   items: SearchWith.values
+            //       .map<DropdownMenuItem<SearchWith>>(
+            //         (value) => DropdownMenuItem(
+            //           value: value,
+            //           child: Text(
+            //             searhWithString(value),
+            //             style: Theme.of(context).textTheme.bodyText2,
+            //           ),
+            //         ),
+            //       )
+            //       .toList(),
+            //   onChanged: (SearchWith? value) {
+            //     setState(() {
+            //       searchWith = value ?? SearchWith.name;
+            //     });
+            //   },
+            // ),
+            searchController: searchController,
+            displayList: displayList
+                .map(
+                  (e) => ListTile(
+                    title: Text(e.hospitalName!),
+                    subtitle: Text(e.hospitalAddress?.streetName ?? ''),
+                    onTap: () {
+                      Navigator.pop(context, e);
+                    },
+                  ),
+                )
+                .toList(),
+          );
+        },
       ),
     );
   }
@@ -805,33 +805,3 @@ class FieldTitle extends StatelessWidget {
     );
   }
 }
-
-class AvailableAppointments {
-  String id;
-  List<int> weekDay;
-  List<Slot> slots;
-
-  AvailableAppointments({
-    this.id = '',
-    required this.weekDay,
-    required this.slots,
-  });
-}
-
-// class Slot {
-//   TimeOfDay from;
-//   TimeOfDay to;
-//   bool isEmergencySlot;
-//   bool isAvailable;
-
-//   Slot({
-//     required this.from,
-//     required this.to,
-//     this.isEmergencySlot = false,
-//     this.isAvailable = false,
-//   });
-
-//   @override
-//   String toString() =>
-//       'Slot(from: $from, to: $to, isEmergencySlot: $isEmergencySlot)';
-// }
