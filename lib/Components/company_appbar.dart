@@ -4,8 +4,12 @@ class CompanyAppbar extends StatelessWidget {
   final String title;
   final double widgetHeight;
   final List<Widget>? actionWidgets;
+  final bool hasBackButton;
   CompanyAppbar(
-      {required this.title, this.actionWidgets, this.widgetHeight = 150});
+      {required this.title,
+      this.actionWidgets,
+      this.widgetHeight = 150,
+      this.hasBackButton = true});
   @override
   Widget build(BuildContext context) {
     return PreferredSize(

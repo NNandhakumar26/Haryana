@@ -1,3 +1,4 @@
+import 'package:doctor_booking_application/Components/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -29,6 +30,13 @@ class Style {
 
   static const Color textFieldBackground = Color(0xffEFF3FE);
 
+  static textFieldStyle(context) =>
+      Theme.of(context).textTheme.headline6!.copyWith(
+            fontSize: 16,
+            color: Style.darkerText,
+            fontWeight: FontWeight.w600,
+          );
+
   static const List<Color> randomColorList = [
     Color(0xffAB8FF4),
     Color(0xffE39AE0),
@@ -44,6 +52,66 @@ class Style {
             letterSpacing: 0.8,
             color: Style.primary.shade600,
           );
+
+  static InputDecoration customBorderFieldDecoration(context, int hintText) =>
+      InputDecoration(
+        labelStyle: Theme.of(context).textTheme.bodyText1!.copyWith(
+              color: Color(0xFF57636C),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+        hintStyle: Style.textTheme.caption!.copyWith(
+          color: Colors.black26,
+          fontSize: 12,
+          letterSpacing: 0.4,
+          fontWeight: FontWeight.normal,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Color(0xFFDBE2E7),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Color(0xFFDBE2E7),
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      );
+
+  static InputDecoration get searchFieldStyle => InputDecoration(
+        hintText: 'Book An Appointment',
+        prefixIcon: Icon(
+          Icons.search,
+          color: Colors.black12,
+        ),
+        filled: true,
+        fillColor: Style.primary.shade50.withOpacity(0.32),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(
+            color: Style.primary.shade50,
+            width: 1.32,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+          borderSide: BorderSide(
+            color: Style.primary.shade50,
+            width: 1.32,
+          ),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+      );
 
   static TextStyle labelStyle(context) => GoogleFonts.roboto(
         fontSize: 15,
@@ -81,6 +149,69 @@ class Style {
 
   static const Color primaryColor = Color(0xff1db7af);
 
+  static Future<T?> navigate<T>(BuildContext context, Widget widget) {
+    return Navigator.pushAndRemoveUntil<T>(
+      context,
+      PageRouteBuilder<T>(
+        opaque: false,
+        pageBuilder: (BuildContext context, _, __) {
+          return widget;
+        },
+        transitionsBuilder:
+            (___, Animation<double> animation, ____, Widget child) {
+          return SlideTransition(
+            position: Tween(
+                    begin: const Offset(1.0, 0.0), end: const Offset(0.0, 0.0))
+                .animate(animation),
+            child: child,
+          );
+        },
+      ),
+      (route) => false,
+    );
+  }
+
+  static Future loadingDialog(BuildContext context,
+      {Widget? widget, String? title}) {
+    return showDialog(
+      context: context,
+      builder: (context) => (widget != null)
+          ? widget
+          : CustomLoadingDialog(
+              title: title ?? '',
+            ),
+    );
+  }
+
+  static Future<T?> navigateBack<T>(BuildContext context, Widget widget) {
+    return Navigator.push<T>(
+      context,
+      PageRouteBuilder<T>(
+        opaque: false,
+        pageBuilder: (BuildContext context, _, __) {
+          return widget;
+        },
+        transitionsBuilder:
+            (___, Animation<double> animation, ____, Widget child) {
+          return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: child,
+          );
+          // return FadeTransition(
+          //   opacity: animation,
+          //   child: RotationTransition(
+          //     turns:
+          //         Tween<double>(begin: 0.5, end: 1.0)
+          //             .animate(animation),
+          //     child: child,
+          //   ),
+          // );
+        },
+      ),
+    );
+  }
+
   static const MaterialColor primary = MaterialColor(
     4278265681,
     <int, Color>{
@@ -96,6 +227,114 @@ class Style {
       900: Color(0xff004e40),
     },
   );
+
+  static ThemeData themeData(context) => ThemeData(
+        primaryColor: Style.primaryColor,
+        textTheme: Style.textTheme,
+        timePickerTheme: TimePickerThemeData(
+          backgroundColor: Colors.white,
+          dialTextColor: Colors.black54,
+          helpTextStyle: Theme.of(context).textTheme.headline6,
+        ),
+        checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateProperty.all(Colors.white),
+          fillColor: MaterialStateProperty.all(Style.primaryColor),
+        ),
+        radioTheme: RadioThemeData(
+          overlayColor:
+              MaterialStateProperty.all(Theme.of(context).primaryColor),
+          fillColor: MaterialStateProperty.all(Style.primaryColor),
+        ),
+        iconTheme: IconThemeData(
+          size: 18,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: Theme.of(context).textTheme.bodyText1!.copyWith(
+                fontFamily: 'Lexend Deca',
+                color: Color(0xFF57636C),
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+          hintStyle: Style.textTheme.caption!.copyWith(
+            color: Colors.black26,
+            fontSize: 12,
+            letterSpacing: 0.4,
+            fontWeight: FontWeight.normal,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFFDBE2E7),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(50),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFFDBE2E7),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(50),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          iconColor: Colors.black38,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: Theme.of(context).primaryColor,
+        ),
+
+        colorScheme: ColorScheme(
+          primary: Style.primaryColor,
+          secondary: Color(0xff1c2340), //001038
+          surface: Color(0xff8a8da0), //868a9a
+          background: Colors.white,
+          error: Color(0xffFF2021),
+          //TODO: Read the documentation and change accordingly
+          onPrimary: Style.primaryColor,
+          onSecondary: Color(0xff1c2340),
+          onSurface: Color(0xff8a8da0),
+          onBackground: Colors.white,
+          onError: Color(0xffFF2021),
+          brightness: Brightness.light,
+        ),
+        //Outlined button for primary colour
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all(StadiumBorder()),
+            textStyle: MaterialStateProperty.all(
+              Theme.of(context).textTheme.button!.copyWith(
+                    color: Colors.white.withOpacity(0.97),
+                  ),
+            ),
+            backgroundColor: MaterialStateProperty.all(Style.primaryColor),
+            padding: MaterialStateProperty.all(
+              EdgeInsets.symmetric(
+                horizontal: 40,
+              ),
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all(StadiumBorder()),
+            textStyle: MaterialStateProperty.all(
+              Theme.of(context).textTheme.button!.copyWith(
+                    color: Style.primaryColor,
+                  ),
+            ),
+            backgroundColor:
+                MaterialStateProperty.all(Colors.white.withOpacity(0.97)),
+            padding: MaterialStateProperty.all(
+                EdgeInsets.symmetric(horizontal: 15, vertical: 10)),
+          ),
+        ),
+
+        scaffoldBackgroundColor: Color.fromARGB(255, 240, 241, 241),
+        //TODO: Read the documentation
+        typography: Typography.material2018(),
+      );
 }
 
 class CompleteBackground extends StatelessWidget {

@@ -6,31 +6,35 @@ class TitleView extends StatelessWidget {
   final String subtitle;
   // final Function? onPressed;
   final VoidCallback? onPressed;
-  TitleView({
-    this.title = '',
-    this.subtitle = '',
-    this.onPressed,
-  });
+  final Color? customColor;
+  TitleView(
+      {this.title = '', this.subtitle = '', this.onPressed, this.customColor});
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 16),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
               title,
               textAlign: TextAlign.left,
-              style: Theme.of(context).textTheme.headline6!.copyWith(
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                    color: Style.darkerText.withOpacity(0.87),
+              style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                    fontSize: 16,
+                    color: customColor ?? Colors.black54,
                   ),
+              // style: Theme.of(context).textTheme.headline6!.copyWith(
+              //       fontSize: 19,
+              //       fontWeight: FontWeight.bold,
+              //       color: Style.darkerText.withOpacity(0.87),
+              //     ),
             ),
           ),
           (subtitle != '')
               ? InkWell(
-                  highlightColor: Colors.transparent,
+                  highlightColor: Colors.red,
                   borderRadius: BorderRadius.all(Radius.circular(4.0)),
                   onTap: onPressed,
                   child: Padding(
@@ -40,8 +44,9 @@ class TitleView extends StatelessWidget {
                         Text(
                           subtitle,
                           textAlign: TextAlign.left,
-                          style:
-                              Theme.of(context).textTheme.subtitle1!.copyWith(),
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: Style.darkerText,
+                              ),
                         ),
                         SizedBox(
                           height: 20,
@@ -49,14 +54,20 @@ class TitleView extends StatelessWidget {
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
                             color: Style.darkerText,
-                            size: 13,
+                            size: 12,
                           ),
                         ),
                       ],
                     ),
                   ),
                 )
-              : SizedBox()
+              : Expanded(
+                  child: Divider(
+                    height: 2,
+                    endIndent: 8,
+                    color: Colors.black45,
+                  ),
+                ),
         ],
       ),
     );
