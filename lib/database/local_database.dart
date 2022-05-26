@@ -31,4 +31,27 @@ class Local {
   static Future<void> setMainUser(Patient patient) async {
     await box!.put('mainPatient', patient);
   }
+
+  // get and put teh appointment id
+  static Appointment? get getAppointmentId {
+    // use a try catch block here
+    List? val = box!.get('appointmentId', defaultValue: null);
+    if (val == null) {
+      return null;
+    } else {
+      return Appointment(
+          appointmentID: val[0], doctorID: val[1], actualDateTime: val[2]);
+    }
+  }
+
+  static Future<void> setAppointmentId(Appointment? appointment) async {
+    if (appointment != null)
+      await box!.put('appointmentId', [
+        appointment.appointmentID,
+        appointment.doctorID,
+        appointment.actualDateTime
+      ]);
+    else
+      await box!.put('appointmentId', null);
+  }
 }

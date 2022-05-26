@@ -70,20 +70,25 @@ class Appointment {
   DateTime? actualDateTime;
   String? doctorID;
   String? patientID;
+  String? patientName;
+  String? patientNumber;
   AppointmentStatus? status;
   String? reason;
   double? fees;
   String? description;
+
   Appointment({
     this.appointmentID,
     this.plannedDateTime,
     this.actualDateTime,
     this.doctorID,
     this.patientID,
+    this.patientName,
+    this.patientNumber,
     this.reason,
     this.fees,
-    this.description,
     this.status = AppointmentStatus.Created,
+    this.description,
   });
 
   Appointment copyWith({
@@ -92,10 +97,12 @@ class Appointment {
     DateTime? actualDateTime,
     String? doctorID,
     String? patientID,
+    String? patientName,
+    String? patientNumber,
     String? reason,
     double? fees,
     String? description,
-    AppointmentStatus? status,
+    AppointmentStatus? staus,
   }) {
     return Appointment(
       appointmentID: appointmentID ?? this.appointmentID,
@@ -103,10 +110,12 @@ class Appointment {
       actualDateTime: actualDateTime ?? this.actualDateTime,
       doctorID: doctorID ?? this.doctorID,
       patientID: patientID ?? this.patientID,
+      patientName: patientName ?? this.patientName,
+      patientNumber: patientNumber ?? this.patientNumber,
       reason: reason ?? this.reason,
       fees: fees ?? this.fees,
       description: description ?? this.description,
-      status: status ?? this.status,
+      status: staus ?? this.status,
     );
   }
 
@@ -117,6 +126,8 @@ class Appointment {
       'actualDateTime': actualDateTime?.millisecondsSinceEpoch,
       'doctorID': doctorID,
       'patientID': patientID,
+      'patientName': patientName,
+      'patientNumber': patientNumber,
       'reason': reason,
       'fees': fees,
       'description': description,
@@ -135,6 +146,8 @@ class Appointment {
           : null,
       doctorID: map['doctorID'],
       patientID: map['patientID'],
+      patientName: map['patientName'],
+      patientNumber: map['patientNumber'],
       reason: map['reason'],
       fees: map['fees']?.toDouble(),
       description: map['description'],
@@ -149,7 +162,7 @@ class Appointment {
 
   @override
   String toString() {
-    return 'Appointment(appointmentID: $appointmentID, plannedDateTime: $plannedDateTime, actualDateTime: $actualDateTime, doctorID: $doctorID, patientID: $patientID, reason: $reason, fees: $fees, description: $description, status: $status)';
+    return 'Appointment(appointmentID: $appointmentID, plannedDateTime: $plannedDateTime, actualDateTime: $actualDateTime, doctorID: $doctorID, patientID: $patientID, patientName: $patientName, patientNumber: $patientNumber, reason: $reason, fees: $fees, description: $description)';
   }
 
   @override
@@ -162,9 +175,10 @@ class Appointment {
         other.actualDateTime == actualDateTime &&
         other.doctorID == doctorID &&
         other.patientID == patientID &&
+        other.patientName == patientName &&
+        other.patientNumber == patientNumber &&
         other.reason == reason &&
         other.fees == fees &&
-        other.status == status &&
         other.description == description;
   }
 
@@ -175,8 +189,9 @@ class Appointment {
         actualDateTime.hashCode ^
         doctorID.hashCode ^
         patientID.hashCode ^
+        patientName.hashCode ^
+        patientNumber.hashCode ^
         reason.hashCode ^
-        status.hashCode ^
         fees.hashCode ^
         description.hashCode;
   }

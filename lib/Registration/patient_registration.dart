@@ -15,7 +15,7 @@ class PatientRegistration extends ChangeNotifier {
   PatientRegistration({
     required this.patient,
   })  : this.dateOfBirth = ValueNotifier(patient.person?.dob ?? DateTime.now()),
-        this.gender = ValueNotifier(patient.person!.gender);
+        this.gender = ValueNotifier(patient.person?.gender ?? '');
 
   final Patient patient;
 
@@ -302,7 +302,7 @@ class PatientRegistrationPage extends StatelessWidget {
                 title: 'Address',
                 fieldWidget: FullTextField(
                   title: 'House No, Street, Area',
-                  multiLine: 4,
+                  multiLine: 2,
                   onChanged: (String value) {
                     patient.person!.address!.streetName = value;
                   },

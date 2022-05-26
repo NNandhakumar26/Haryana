@@ -115,37 +115,38 @@ class Network {
   }
 
   //Create a doctor appointment
-  static Future<dynamic> createAppointment(
+  static Future<Appointment?> createAppointment(
     Appointment appointment,
     DateTime date,
   ) async {
     return await doctorInstance
         .doc(appointment.doctorID)
-        .collection('Appointment')
+        .collection('Appointments')
         .doc(dateToString(date))
         .set(
       {
-        'Appointment': FieldValue.arrayUnion([appointment.toMap()]),
+        'appointments': FieldValue.arrayUnion([appointment.toMap()]),
       },
       SetOptions(
         merge: true,
       ),
-    ).then(
-      (value) {
-        // return value.id;
-      },
-    );
+    ).then((value) {
+      return appointment;
+    });
   }
 
 //Appointment
 
-  static Stream<List<Appointment>> getCurrentAppointmentStream(
-      {String? doctorID, DateTime? dateTime}) async* {
-    if (doctorID == null) {
+  static Stream<List<Appointment>> getPatientAppointmentStream({
+    required Appointment appointment,
+  }) async* {
+    if (appointment.doctorID != null) {
       yield* doctorInstance
-          .doc(tempDoctorId)
+          .doc(appointment.doctorID)
           .collection('Appointments')
-          .doc(dateToString(dateTime!))
+          .doc(
+            dateToString(appointment.actualDateTime!),
+          )
           .snapshots()
           .map(
             (value) => (value.data()!['appointments'] as List<dynamic>)
@@ -185,18 +186,54 @@ class Network {
     // }
   }
 
-  // function to update the appointment status
-  static Future<void> updateAppointmentStatus(String appointmentID,
-          AppointmentStatus status, DateTime dateTime) async =>
-      await doctorInstance
+  static Stream<List<Appointment>> getAppointmentStream(
+      {String? doctorID, DateTime? dateTime}) async* {
+    if (doctorID == null) {
+      yield* doctorInstance
           .doc(tempDoctorId)
           .collection('Appointments')
-          .doc(dateToString(dateTime))
-          .update(
-        {
-          'status': appointmentStatusToString(status),
-        },
-      );
+          .doc(dateToString(dateTime!))
+          .snapshots()
+          .map(
+            (value) => (value.data()!['appointments'] as List<dynamic>)
+                .map(
+                  (e) => Appointment.fromMap(e),
+                )
+                .toList(),
+          );
+    }
+  }
+
+  // function to update the appointment status
+  static Future<bool> updateAppointmentStatus(
+      Appointment appointment, AppointmentStatus status) async {
+    Appointment thisAppointment = appointment.copyWith(
+      staus: status,
+    );
+
+    return await doctorInstance
+        .doc(appointment.doctorID)
+        .collection('Appointments')
+        .doc(dateToString(appointment.actualDateTime!))
+        .update(
+      {
+        'appointments': FieldValue.arrayUnion([thisAppointment.toMap()]),
+      },
+    ).then(
+      (value) async {
+        await doctorInstance
+            .doc(appointment.doctorID)
+            .collection('Appointments')
+            .doc(dateToString(appointment.actualDateTime!))
+            .update(
+          {
+            'appointments': FieldValue.arrayRemove([appointment.toMap()]),
+          },
+        );
+        return true;
+      },
+    );
+  }
 
   // get doctor Appointment for consecutive 3 days
   // static Stream<List<Appointment>> getDoctorAppointment(

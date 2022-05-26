@@ -1,18 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor_booking_application/Components/company_appbar.dart';
 import 'package:doctor_booking_application/Registration/doctor_registration.dart';
 import 'package:doctor_booking_application/Registration/patient_registration.dart';
-import 'package:doctor_booking_application/Template/tabs/HomeTab.dart';
+
 import 'package:doctor_booking_application/Widgets/titleView.dart';
 import 'package:doctor_booking_application/book_appoinment/book_appoinment_main.dart';
+import 'package:doctor_booking_application/book_appoinment/book_slot.dart';
 import 'package:doctor_booking_application/constants.dart';
+import 'package:doctor_booking_application/database/database_export.dart';
 import 'package:doctor_booking_application/doctor/doctor_appointment_page.dart';
 import 'package:doctor_booking_application/first_page/first_page.dart';
 import 'package:doctor_booking_application/modals/doctors.dart';
 import 'package:doctor_booking_application/modals/model_export.dart';
 import 'package:doctor_booking_application/style.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'Template/tabs/ScheduleTab.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class MainPage extends StatefulWidget {
   final bool doctorLogin;
@@ -172,12 +175,26 @@ class CustomDrawerWidget extends StatelessWidget {
         MaterialButton(
           onPressed: () {
             if (widget != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => widget!,
-                ),
-              );
+              if (title == 'My Schedule')
+                Style.navigate(
+                  context,
+                  MainPage(
+                    doctorLogin: true,
+                  ),
+                );
+              else
+                Style.navigate(
+                  context,
+                  MainPage(
+                    doctorLogin: false,
+                  ),
+                );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => widget!,
+              //   ),
+              // );
             } else if (function != null) {
               function!();
             }
@@ -391,6 +408,7 @@ class DoctorFirstPageWidget extends StatelessWidget {
             ),
           ),
         ),
+
         TitleView(
           title: 'Appointment Today',
         ),
@@ -412,6 +430,7 @@ class PatientFirstPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('The local appointment id is  ${Local.getAppointmentId}');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -428,6 +447,101 @@ class PatientFirstPageWidget extends StatelessWidget {
             decoration: Style.searchFieldStyle,
           ),
         ),
+        // if (Local.getAppointmentId != null)
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(vertical: 16.0),
+        //     child: Column(
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+        //         DarkTitleView(
+        //           'Your Appointments',
+        //         ),
+        //         ListTile(
+        //           onTap: () {
+        //             Style.navigateBack(context, BookSlotPage());
+        //           },
+        //           contentPadding: EdgeInsets.symmetric(
+        //             vertical: 8,
+        //             horizontal: 6,
+        //           ),
+        //           title: Text(
+        //             'Appointment Status',
+        //             style: Theme.of(context).textTheme.headline6!.copyWith(
+        //                   color: Colors.black.withOpacity(0.70),
+        //                   // color: C,
+        //                   fontSize: 16,
+        //                 ),
+        //           ),
+        //           subtitle: Padding(
+        //             padding: const EdgeInsets.all(2),
+        //             child: Text(
+        //               'Click to check you appointment status',
+        //               style: Theme.of(context).textTheme.caption!.copyWith(
+        //                     color: Colors.black45,
+        //                   ),
+        //             ),
+        //           ),
+        //           trailing: Icon(
+        //             Icons.arrow_forward_ios,
+        //             size: 18,
+        //             color: Colors.grey.shade400,
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+
+        //TODO: check its' working or not
+        ValueListenableBuilder<Box>(
+          valueListenable: Hive.box('mainBox').listenable(),
+          builder: (context, box, widget) {
+            if (box.get('appointmentId') != null)
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DarkTitleView(
+                      'Your Appointments',
+                    ),
+                    ListTile(
+                      onTap: () {
+                        Style.navigateBack(context, BookSlotPage());
+                      },
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 6,
+                      ),
+                      title: Text(
+                        'Appointment Status',
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Colors.black.withOpacity(0.70),
+                              // color: C,
+                              fontSize: 16,
+                            ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Text(
+                          'Click to check you appointment status',
+                          style: Theme.of(context).textTheme.caption!.copyWith(
+                                color: Colors.black45,
+                              ),
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 18,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            return SizedBox.shrink();
+          },
+        ),
+
         // TitleView(
         //   title: 'Promo Today',
         // ),
@@ -446,14 +560,8 @@ class PatientFirstPageWidget extends StatelessWidget {
         //   ),
         //   alignment: Alignment.center,
         // ),
-        16.height,
-        Text(
-          'Whom are you looking for today?',
-          style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                fontSize: 16,
-                color: Colors.black87,
-              ),
-        ),
+
+        DarkTitleView('Whom are you looking for today?'),
 
         8.height,
         Padding(
@@ -560,6 +668,25 @@ class PatientFirstPageWidget extends StatelessWidget {
         // for (var i = 0; i < 2; i++) DoctorIntroWidget(),
         320.height,
       ],
+    );
+  }
+}
+
+class DarkTitleView extends StatelessWidget {
+  final String value;
+  const DarkTitleView(
+    this.value, {
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      value,
+      style: Theme.of(context).textTheme.subtitle2!.copyWith(
+            fontSize: 16,
+            color: Colors.black87,
+          ),
     );
   }
 }

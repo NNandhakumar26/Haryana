@@ -9,6 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 
 enum FilterStatus { Upcoming, Complete, Cancel }
+// global scaffold key
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class DoctorAppointmentPage extends StatelessWidget {
   DoctorAppointmentPage({
@@ -21,6 +23,7 @@ class DoctorAppointmentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      key: _scaffoldKey,
       child: DefaultTabController(
         length: 3,
         initialIndex: 0,
@@ -67,7 +70,7 @@ class DoctorAppointmentPage extends StatelessWidget {
                   ),
                   indicatorColor: Theme.of(context).primaryColor,
                   onTap: (value) {},
-                  tabs: ['Upcoming', 'Ongoing', 'Finished']
+                  tabs: ['Upcoming', 'Finished', 'Pending']
                       .map(
                         (e) => Center(
                           child: Text(
@@ -121,8 +124,8 @@ class DoctorAppointmentPage extends StatelessWidget {
       children: [
         ...[
           AppointmentStatus.Created,
-          AppointmentStatus.Accepted,
-          AppointmentStatus.Finished
+          AppointmentStatus.Finished,
+          AppointmentStatus.Pending,
         ].map(
           (status) {
             List<Appointment> displayList = appointment
@@ -137,22 +140,31 @@ class DoctorAppointmentPage extends StatelessWidget {
                     return CompleteAppointmentContainer(
                       appointment: displayList[index],
                       function: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => StatefulBuilder(
-                            builder: (context, setState) {
-                              return CustomAlertDialog(
-                                context: context,
-                                title: 'Finish Booking',
-                                columnWidgets: [
-                                  // BillingWidget(
-                                  //   displayList[index],
-                                  // ),
-                                ],
-                              );
-                            },
-                          ),
+                        Style.loadingDialog(context, title: 'Updating...');
+                        await Network.updateAppointmentStatus(
+                          displayList[index],
+                          AppointmentStatus.Pending,
+                        ).then(
+                          (value) {
+                            Navigator.pop(context);
+                          },
                         );
+                        // await showDialog(
+                        //   context: context,
+                        //   builder: (context) => StatefulBuilder(
+                        //     builder: (context, setState) {
+                        //       return CustomAlertDialog(
+                        //         context: context,
+                        //         title: 'Finish Booking',
+                        //         columnWidgets: [
+                        //           // BillingWidget(
+                        //           //   displayList[index],
+                        //           // ),
+                        //         ],
+                        //       );
+                        //     },
+                        //   ),
+                        // );
                       },
                     );
 
@@ -169,79 +181,6 @@ class DoctorAppointmentPage extends StatelessWidget {
       ],
     );
   }
-
-  // Widget billingWidgets(BuildContext context) {
-  //   return Column(
-  //     mainAxisSize: MainAxisSize.min,
-  //     children: [
-  //       Table(
-  //         defaultColumnWidth: FlexColumnWidth(),
-  //         children: [
-  //           ...[
-  //             ['Consultation Charges', '2500'],
-  //             ['CGST', '250'],
-  //             ['SGST', '250'],
-  //             ['Total', '3000'],
-  //           ]
-  //               .map(
-  //                 (e) => TableRow(
-  //                   children: [
-  //                     Padding(
-  //                       padding: const EdgeInsets.symmetric(vertical: 4.0),
-  //                       child: Text(
-  //                         '${e[0]}',
-  //                         style:
-  //                             Theme.of(context).textTheme.subtitle2!.copyWith(
-  //                                   color: Colors.black54,
-  //                                 ),
-  //                       ),
-  //                     ),
-  //                     Text(
-  //                       '  :  ',
-  //                       style: Theme.of(context).textTheme.subtitle2!.copyWith(
-  //                             color: Colors.black54,
-  //                           ),
-  //                     ),
-  //                     Text(
-  //                       e[1],
-  //                       textAlign: TextAlign.right,
-  //                       style: Theme.of(context).textTheme.bodyText1!.copyWith(
-  //                             color: Colors.black87,
-  //                             fontWeight: FontWeight.w600,
-  //                           ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               )
-  //               .toList()
-  //         ],
-  //       ),
-  //       Padding(
-  //         padding: const EdgeInsets.symmetric(vertical: 8.0),
-  //         child: FullTextField(
-  //           title: 'Amount Paid',
-  //         ),
-  //       ),
-  //       FullTextField(
-  //         title: 'Remarks',
-  //         multiLine: 4,
-  //       ),
-  //       Padding(
-  //         padding: const EdgeInsets.symmetric(vertical: 8.0),
-  //         child: RowHalfButton(
-  //           text: 'Finish',
-  //           onPressed: () async{
-  //             //TODO: Finish the appointment
-  //             Style.loadingDialog(context,title: 'Finishing Appointment');
-  //             Network.finishAppointment()
-  //             Navigator.pop(context);
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
 }
 
 class CompleteAppointmentContainer extends StatelessWidget {
@@ -272,12 +211,15 @@ class CompleteAppointmentContainer extends StatelessWidget {
           child: Column(
             children: [
               CustomPatientWidget(
-                patientID: appointment.patientID!,
+                patientName: appointment.patientName!,
+                phoneNumber: (int.tryParse(appointment.patientNumber!) != null)
+                    ? int.tryParse(appointment.patientNumber!)
+                    : 0,
+                description: appointment.description,
               ),
               Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Text(
                   //   'Token : ${appointment.patientID}',
@@ -290,7 +232,7 @@ class CompleteAppointmentContainer extends StatelessWidget {
                   RowHalfButton(
                     isPrimary: true,
                     onPressed: () => function(),
-                    text: 'Finish Now',
+                    text: 'Pending Pay',
                   ),
                 ],
               ),
@@ -307,13 +249,12 @@ class AppointmentWidget extends StatelessWidget {
     Key? key,
     required this.appointment,
     required this.isLastElement,
-    this.widget,
+    // this.widget,
   }) : super(key: key);
 
   final bool isLastElement;
-  // final Map _schedule;
   final Appointment appointment;
-  final Widget? widget;
+  // final Widget? widget;
 
   @override
   Widget build(BuildContext context) {
@@ -323,169 +264,163 @@ class AppointmentWidget extends StatelessWidget {
         elevation: 3,
         shadowColor: Colors.black38,
         margin: !isLastElement ? EdgeInsets.only(bottom: 20) : EdgeInsets.zero,
-        child: (widget != null)
-            ? widget
-            : Padding(
-                padding: EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // CircleAvatar(
-                    //   backgroundImage: AssetImage(_schedule['img']),
-                    // ),
-                    // SizedBox(
-                    //   width: 10,
-                    // ),
-                    CustomPatientWidget(patientID: appointment.patientID ?? ''),
-                    // CustomFutureBuilder<Patient>(
-                    //   futureFunction:
-                    //       Network.getPatientDetails(appointment.patientID!),
-                    //   onSuccessWidget: (patient) {
-                    //     print(patient);
-                    //     return ListTile(
-                    //       title: Text(
-                    //         patient.person!.name,
-                    //         style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                    //               color: Style.darkerText,
-                    //               fontWeight: FontWeight.w600,
-                    //             ),
-                    //       ),
-                    //       subtitle: Padding(
-                    //         padding: EdgeInsets.symmetric(vertical: 5),
-                    //         child: Text(
-                    //           appointment.patientID.toString(),
-                    //           // _schedule['doctorTitle'],
-                    //           style: Theme.of(context).textTheme.caption!.copyWith(
-                    //                 color: Style.lightText,
-                    //                 fontSize: 12,
-                    //               ),
-                    //         ),
-                    //       ),
-                    //       trailing: IconButton(
-                    //         onPressed: () =>
-                    //             launch('tel:${patient.person!.contact1}'),
-                    //         icon: Icon(
-                    //           Icons.phone,
-                    //           color: Colors.green,
-                    //         ),
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
-
-                    // SizedBox(
-                    //   height: 15,
-                    // ),
-                    // ColouredCard(
-                    //   doctorID: appointment!.doctorID!,
-                    //   slot: appointment!.slot ??
-                    //       Slot(
-                    //         from: TimeOfDay.now(),
-                    //         to: TimeOfDay.now(),
-                    //       ),
-                    // ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        RowHalfButton(
-                          isPrimary: false,
-                          text: 'Cancel',
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: PopupMenuButton<String>(
-                            itemBuilder: (itemBuilder) => ['Finish', 'Payment']
-                                .map(
-                                  (item) => PopupMenuItem(
-                                    value: item,
-                                    child: Text(item),
-                                  ),
-                                )
-                                .toList(),
-                            child: Container(
-                              child: RowHalfButton(
-                                isPrimary: true,
-                                text: 'Finish',
-                                onPressed: () {},
-                              ),
-                            ),
-                            onSelected: (value) async {
-                              await onPressed(context, value);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+        child: Padding(
+          padding: EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // CircleAvatar(
+              //   backgroundImage: AssetImage(_schedule['img']),
+              // ),
+              // SizedBox(
+              //   width: 10,
+              // ),
+              CustomPatientWidget(
+                patientName: appointment.patientName!,
+                phoneNumber: (int.tryParse(appointment.patientNumber!) != null)
+                    ? int.tryParse(appointment.patientNumber!)
+                    : 0,
+                description: appointment.description,
               ),
+              // CustomFutureBuilder<Patient>(
+              //   futureFunction:
+              //       Network.getPatientDetails(appointment.patientID!),
+              //   onSuccessWidget: (patient) {
+              //     print(patient);
+              //     return ListTile(
+              //       title: Text(
+              //         patient.person!.name,
+              //         style: Theme.of(context).textTheme.bodyText2!.copyWith(
+              //               color: Style.darkerText,
+              //               fontWeight: FontWeight.w600,
+              //             ),
+              //       ),
+              //       subtitle: Padding(
+              //         padding: EdgeInsets.symmetric(vertical: 5),
+              //         child: Text(
+              //           appointment.patientID.toString(),
+              //           // _schedule['doctorTitle'],
+              //           style: Theme.of(context).textTheme.caption!.copyWith(
+              //                 color: Style.lightText,
+              //                 fontSize: 12,
+              //               ),
+              //         ),
+              //       ),
+              //       trailing: IconButton(
+              //         onPressed: () =>
+              //             launch('tel:${patient.person!.contact1}'),
+              //         icon: Icon(
+              //           Icons.phone,
+              //           color: Colors.green,
+              //         ),
+              //       ),
+              //     );
+              //   },
+              // ),
+              // SizedBox(
+              //   height: 15,
+              // ),
+              // ColouredCard(
+              //   doctorID: appointment!.doctorID!,
+              //   slot: appointment!.slot ??
+              //       Slot(
+              //         from: TimeOfDay.now(),
+              //         to: TimeOfDay.now(),
+              //       ),
+              // ),
+              SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RowHalfButton(
+                    isPrimary: false,
+                    text: 'Cancel',
+                    onPressed: () async {
+                      await onPressed(
+                        'Cancel',
+                      );
+                    },
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  RowHalfButton(
+                    isPrimary: true,
+                    text: 'Finish',
+                    onPressed: () async => await onPressed(
+                      'Finish',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Future<void> onPressed(BuildContext context, String value) async {
-    Style.loadingDialog(context, title: 'Updating Status');
+  Future<void> onPressed(String value) async {
+    Style.loadingDialog(_scaffoldKey.currentContext!, title: 'Updating Status');
 
     await Network.updateAppointmentStatus(
-            appointment.appointmentID!,
-            (value == 'Finish')
-                ? AppointmentStatus.Finished
-                : AppointmentStatus.Cancelled,
-            DateTime.now())
-        .then(
+      appointment,
+      (value == 'Finish')
+          ? AppointmentStatus.Finished
+          : AppointmentStatus.Cancelled,
+    ).then(
       (value) {
-        Navigator.pop(context);
+        Navigator.pop(
+          _scaffoldKey.currentContext!,
+        );
       },
     );
   }
 }
 
 class CustomPatientWidget extends StatelessWidget {
-  final String patientID;
+  final String patientName;
+  final int? phoneNumber;
+  final String? description;
   const CustomPatientWidget({
     Key? key,
-    required this.patientID,
+    required this.patientName,
+    required this.phoneNumber,
+    this.description,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CustomFutureBuilder<Patient>(
-      futureFunction: Future.value(Patient()),
-      onSuccessWidget: (value) => Container(),
-      // futureFunction: Network.getPatientDetails(patientID),
-      // onSuccessWidget: (patient) => ListTile(
-      //   title: Text(
-      //     patient.person!.name,
-      //     style: Theme.of(context).textTheme.headline6!.copyWith(
-      //           color: Colors.black87,
-      //           fontSize: 18,
-      //         ),
-      //   ),
-      //   trailing: (patient.person?.contact1 != null)
-      //       ? Tooltip(
-      //           message: patient.person!.contact1!.toString(),
-      //           child: IconButton(
-      //             onPressed: () => launch('tel:${patient.person!.contact1!}'),
-      //             icon: Icon(
-      //               Icons.call,
-      //               color: Colors.green,
-      //             ),
-      //           ),
-      //         )
-      //       : SizedBox.shrink(),
-      //   subtitle: Padding(
-      //     padding: const EdgeInsets.symmetric(vertical: 6.0),
-      //     child: Text(
-      //       'Age : ${patient.person!.age}',
-      //       style: Theme.of(context).textTheme.caption,
-      //     ),
-      //   ),
-      // ),
+    return ListTile(
+      title: Text(
+        patientName,
+        style: Theme.of(context).textTheme.headline6!.copyWith(
+              color: Colors.black87,
+              fontSize: 18,
+            ),
+      ),
+      trailing: (phoneNumber != null)
+          ? Tooltip(
+              message: phoneNumber?.toString() ?? '',
+              child: IconButton(
+                onPressed: () => launch('tel:$phoneNumber'),
+                icon: Icon(
+                  Icons.call,
+                  color: Colors.green,
+                ),
+              ),
+            )
+          : SizedBox.shrink(),
+      subtitle: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6.0),
+        child: Text(
+          '$description',
+          maxLines: 2,
+          style: Theme.of(context).textTheme.caption,
+        ),
+      ),
     );
   }
 }

@@ -1,12 +1,16 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:badges/badges.dart';
+import 'package:doctor_booking_application/Widgets/boucing_button.dart';
 import 'package:doctor_booking_application/Widgets/future_builder.dart';
 import 'package:doctor_booking_application/Widgets/search_widget.dart';
 import 'package:doctor_booking_application/book_appoinment/available_doctor.dart';
+import 'package:doctor_booking_application/book_appoinment/book_slot.dart';
 import 'package:doctor_booking_application/database/cloud_database.dart';
+import 'package:doctor_booking_application/first_page/first_page.dart';
 import 'package:doctor_booking_application/modals/model_export.dart';
 import 'package:flutter/material.dart';
 import '../style.dart';
+import 'package:flutter_bounce/flutter_bounce.dart' as bbounce;
 
 class BookAppoinmentPage extends StatefulWidget {
   @override
@@ -144,7 +148,7 @@ class DoctorPage extends StatelessWidget {
   final Doctor doctor;
   DoctorPage(this.doctor, {Key? key}) : super(key: key);
 
-  String dateValue(String value) {
+  String stringToDate(String value) {
     switch (value) {
       case 'Tomorrow':
         return DateTime.now().add(Duration(days: 1)).toString().split(' ')[0];
@@ -188,31 +192,28 @@ class DoctorPage extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 16.0),
                 child: RichText(
                   text: TextSpan(
-                      text: 'Waiting Number : ',
-                      style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                            color: Colors.white.withOpacity(0.72),
-                            letterSpacing: 0.8,
-                          ),
-                      children: [
-                        TextSpan(
-                          text: '5',
-                          style:
-                              Theme.of(context).textTheme.headline6!.copyWith(
-                                    color: Colors.white.withOpacity(0.98),
-                                  ),
+                    text: 'Waiting Number : ',
+                    style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                          color: Colors.white.withOpacity(0.72),
+                          letterSpacing: 0.8,
                         ),
-                      ]),
+                    children: [
+                      TextSpan(
+                        text: '5',
+                        style: Theme.of(context).textTheme.headline6!.copyWith(
+                              color: Colors.white.withOpacity(0.98),
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
+              bbounce.Bounce(
+                duration: Duration(milliseconds: 350),
                 onPressed: () async {
                   showDialog(
                     context: context,
-                    builder: (builder) {
+                    builder: (context) {
                       return Dialog(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -222,25 +223,24 @@ class DoctorPage extends StatelessWidget {
                                 ['Today', 'Tomorrow', 'Day after Tomorrow']
                                     .map(
                                       (e) => ListTile(
-                                        onTap: () async {
+                                        onTap: () {
                                           Navigator.pop(context);
-                                          Style.loadingDialog(context);
-                                          await Network.createAppointment(
-                                            Appointment(
-                                              doctorID: doctor.doctorID,
-                                              actualDateTime: DateTime.now(),
-                                              status: AppointmentStatus.Created,
+                                          // Style.loadingDialog(context);
+                                          Style.navigateBack<void>(
+                                            context,
+                                            BookSlotPage(
+                                              appointment: Appointment(
+                                                doctorID: doctor.doctorID,
+                                                actualDateTime: DateTime.parse(
+                                                  stringToDate(e),
+                                                ),
+                                              ),
                                             ),
-                                            DateTime.parse(
-                                              dateValue(e),
-                                            ),
-                                          ).then(
-                                            (value) => Navigator.pop(context),
                                           );
                                         },
                                         title: Text(e),
                                         subtitle: Text(
-                                          dateValue(e),
+                                          stringToDate(e),
                                         ),
                                       ),
                                     )
@@ -251,11 +251,74 @@ class DoctorPage extends StatelessWidget {
                     },
                   );
                 },
-                child: Text(
-                  'Book Slot',
-                  style: Theme.of(context).textTheme.button!.copyWith(
-                        color: Style.primary.shade600,
-                      ),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    color: Colors.white,
+                  ),
+                  child: Text(
+                    'Book Slot',
+                    style: Theme.of(context).textTheme.button!.copyWith(
+                          color: Style.primary.shade600,
+                        ),
+                  ),
+                  // child: OutlinedButton(
+                  //   style: OutlinedButton.styleFrom(
+                  //     backgroundColor: Colors.white,
+                  //     padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  //   ),
+                  //   onPressed: () async {
+                  //     // showDialog(
+                  //     //   context: context,
+                  //     //   builder: (context) {
+                  //     //     return Dialog(
+                  //     //       child: Padding(
+                  //     //         padding: const EdgeInsets.all(8.0),
+                  //     //         child: Column(
+                  //     //           mainAxisSize: MainAxisSize.min,
+                  //     //           children: [
+                  //     //             'Today',
+                  //     //             'Tomorrow',
+                  //     //             'Day after Tomorrow'
+                  //     //           ]
+                  //     //               .map(
+                  //     //                 (e) => ListTile(
+                  //     //                   onTap: () {
+                  //     //                     Navigator.pop(context);
+                  //     //                     // Style.loadingDialog(context);
+                  //     //                     Style.navigateBack<void>(
+                  //     //                       context,
+                  //     //                       BookSlotPage(
+                  //     //                         appointment: Appointment(
+                  //     //                           doctorID: doctor.doctorID,
+                  //     //                           actualDateTime: DateTime.parse(
+                  //     //                             stringToDate(e),
+                  //     //                           ),
+                  //     //                         ),
+                  //     //                       ),
+                  //     //                     );
+                  //     //                   },
+                  //     //                   title: Text(e),
+                  //     //                   subtitle: Text(
+                  //     //                     stringToDate(e),
+                  //     //                   ),
+                  //     //                 ),
+                  //     //               )
+                  //     //               .toList(),
+                  //     //         ),
+                  //     //       ),
+                  //     //     );
+                  //     //   },
+                  //     // );
+                  //   },
+                  //   child: Text(
+                  //     'Book Slot',
+                  //     style: Theme.of(context).textTheme.button!.copyWith(
+                  //           color: Style.primary.shade600,
+                  //         ),
+                  //   ),
+                  // ),
                 ),
               ),
             ],
@@ -373,7 +436,7 @@ class DoctorPage extends StatelessWidget {
                                 .map(
                                   (e) => Tab(
                                     icon: Text(e),
-                                    text: dateValue(e),
+                                    text: stringToDate(e),
                                   ),
                                 )
                                 .toList(),
@@ -392,20 +455,28 @@ class DoctorPage extends StatelessWidget {
                                   .snapshots()
                                   .map(
                                 (event) {
+                                  print('snapshot event is ${event.data()!}');
                                   return (event.data()!['appointments']
                                           as List<dynamic>)
                                       .map(
-                                    (e) {
-                                      print(
-                                          'Entered into appointment with a value of $e');
-                                      return Appointment.fromMap(e);
-                                    },
-                                  ).toList();
+                                        (e) {
+                                          print(
+                                              'Entered into appointment with a value of $e');
+                                          return Appointment.fromMap(e);
+                                        },
+                                      )
+                                      .toList()
+                                      .where(
+                                        (element) =>
+                                            element.status ==
+                                            AppointmentStatus.Created,
+                                      )
+                                      .toList();
                                 },
                               ),
                               builder: (context, snapshot) {
                                 print(
-                                    'The snapshot data is ${snapshot.data.runtimeType} and the connection state is ${snapshot.connectionState}');
+                                    'The snapshot data is ${snapshot.data.runtimeType} and the connection state is ${snapshot.connectionState} with data ${snapshot.data}');
                                 if ((snapshot.connectionState ==
                                         ConnectionState.waiting) ||
                                     (snapshot.connectionState ==
@@ -429,7 +500,7 @@ class DoctorPage extends StatelessWidget {
                                     );
                                   } else
                                     return Center(
-                                      child: CircularProgressIndicator(),
+                                      child: Text('Something Went Wrong'),
                                     );
                                 } else {
                                   return Center(

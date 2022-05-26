@@ -212,6 +212,10 @@ class Style {
     );
   }
 
+  static bool keyboardIsVisible(BuildContext context) {
+    return !(MediaQuery.of(context).viewInsets.bottom == 0.0);
+  }
+
   static const MaterialColor primary = MaterialColor(
     4278265681,
     <int, Color>{
